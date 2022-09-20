@@ -1,0 +1,29 @@
+<!-- <div class="row">
+    <div class="col">
+    <div *ngFor="let floor of floor_devices | keyvalue">{{floor.key}}</div>
+</div>
+</div> -->
+
+<div class="row">
+  <div class="col">
+    <div ngbDropdown class="d-inline-block">
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        id="dropdownBasic1"
+        ngbDropdownToggle
+      >
+        Select floor
+      </button>
+      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+        <button
+          ngbDropdownItem
+          (click)="Floor_selected($event, gateway_info)"
+          *ngFor="let floor of floor_list"
+        >
+          {{ floor }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
