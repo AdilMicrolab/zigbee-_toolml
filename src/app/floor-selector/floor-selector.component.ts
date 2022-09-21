@@ -3,6 +3,7 @@ import { Mqtt } from 'src/app/mqtt.service';
 import { IMqttMessage } from 'ngx-mqtt';
 import { Router } from '@angular/router';
 import { Subscription, takeUntil, Subject } from 'rxjs';
+import { isEqual } from 'lodash';
 
 @Component({
   templateUrl: './floor-selector.component.html',
@@ -11,7 +12,7 @@ import { Subscription, takeUntil, Subject } from 'rxjs';
 export class FloorSelectorComponent implements OnInit, OnDestroy {
   subscription!: Subscription;
   message: any;
-  floor_selec: String = '';
+  floor_selec: string = '';
   gateway_info: any = [];
   floor_list: any = [];
   unSubscribe$ = new Subject();
@@ -30,7 +31,7 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let full_topic: string = message.topic;
-        let info_array = full_topic
+        let info_array: string[] = full_topic
           .replace('zigbee/', '')
           .replace('/bridge/state', '')
           .split('_');
@@ -52,25 +53,35 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
       });
     // this.mqtt_sub.publish('test', 'test');
   }
-  match_floors_gateways(info_array: any, selec_floor: String) {
-    let test: string = '1';
-    console.log(typeof selec_floor, selec_floor);
-    console.log(selec_floor === '1');
-    const devices = info_array.filter((obj: any) => {
-      console.log(obj.floor);
-      // console.log(selec_floor);
-      return obj.floor === '1';
-    });
-    // const devices = info_array.find((x: any) => x.floor === selec_floor);
+  match_floors_gateways(
+    gateway_info: { floor: string; gateway: string; status: string }[],
+    selec_floor: string
+  ) {
+    // let test: string = '1';
+    // console.log(typeof selec_floor, selec_floor);
+    // console.log(selec_floor === '1');
+    let floor: string = selec_floor;
+    console.log();
+    const devices = gateway_info.filter(
+      (obj: { floor: string; gateway: string; status: string }) => {
+        console.log(typeof selec_floor);
+        console.log(typeof obj.floor);
+        console.log(obj);
+        return obj.floor === floor;
+      }
+    );
     console.log(devices);
     return devices;
     // get all devices for each floor and append
   }
 
-  Floor_selected(event: any, info_array: any) {
+  Floor_selected(
+    event: any,
+    gateway_info: { floor: string; gateway: string; status: string }[]
+  ) {
     this.floor_selec = '';
     this.floor_selec = event.target.innerHTML;
-    this.match_floors_gateways(info_array, this.floor_selec);
+    this.match_floors_gateways(gateway_info, this.floor_selec);
     // let test = this.floor_devices;
     // let devices = Object.keys(test)
     //   .filter(function (k) {
