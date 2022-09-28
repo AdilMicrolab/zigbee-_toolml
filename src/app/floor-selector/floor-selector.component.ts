@@ -3,7 +3,6 @@ import { Mqtt } from 'src/app/mqtt.service';
 import { IMqttMessage } from 'ngx-mqtt';
 import { Router } from '@angular/router';
 import { Subscription, takeUntil, Subject } from 'rxjs';
-import { isEqual } from 'lodash';
 
 @Component({
   templateUrl: './floor-selector.component.html',
@@ -13,11 +12,13 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
   subscription!: Subscription;
   message: any;
   floor_selec: string = '';
+  devices_selec: any[] = [];
   gateway_info: any = [];
   floor_list: any = [];
   unSubscribe$ = new Subject();
   current_gateway: string = '';
   current_floor: string = '';
+
   constructor(
     private mqtt_sub: Mqtt,
     private route: Router,
@@ -57,21 +58,19 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
     gateway_info: { floor: string; gateway: string; status: string }[],
     selec_floor: string
   ) {
-    // let test: string = '1';
-    // console.log(typeof selec_floor, selec_floor);
-    // console.log(selec_floor === '1');
+    this.devices_selec = [];
     let floor: string = selec_floor;
-    console.log();
     const devices = gateway_info.filter(
       (obj: { floor: string; gateway: string; status: string }) => {
-        console.log(typeof selec_floor);
-        console.log(typeof obj.floor);
-        console.log(obj);
         return obj.floor === floor;
       }
     );
-    console.log(devices);
-    return devices;
+
+    this.devices_selec = [
+      ...new Set(devices.map((a: any) => [a.gateway, a.status])),
+    ].sort();
+
+    return this.devices_selec;
     // get all devices for each floor and append
   }
 
@@ -80,20 +79,12 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
     gateway_info: { floor: string; gateway: string; status: string }[]
   ) {
     this.floor_selec = '';
-    this.floor_selec = event.target.innerHTML;
+    this.floor_selec = event.target.innerHTML.trim();
+
     this.match_floors_gateways(gateway_info, this.floor_selec);
-    // let test = this.floor_devices;
-    // let devices = Object.keys(test)
-    //   .filter(function (k) {
-    //     return k.indexOf('floor_selec') == 0;
-    //   })
-    //   .reduce(function (newData: any, k) {
-    //     newData[k] = test[k];
-    //     return newData;
-    //   }, {});
 
     this.route.navigate(['gateway-selector'], {
-      state: { floor: this.floor_selec },
+      state: { floor: this.floor_selec, gateways: this.devices_selec },
     });
     //console.log(this.floor_selec);
   }

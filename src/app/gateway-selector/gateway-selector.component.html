@@ -10,7 +10,14 @@
         Select gateway
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-        <button ngbDropdownItem>test</button>
+        <button
+          ngbDropdownItem
+          [disabled]="disable_gateways(gateway[1], gateway[2])"
+          (click)="openDialog('0ms', '8000ms')"
+          *ngFor="let gateway of full_gateway_description"
+        >
+          Gateway {{ gateway[0] }} (cap. {{ gateway[2] }})
+        </button>
       </div>
     </div>
   </div>

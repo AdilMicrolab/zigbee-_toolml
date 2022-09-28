@@ -12,6 +12,10 @@ import { ConfirmPageComponent } from './confirm-page/confirm-page.component';
 import { LoadingPageComponent } from './loading-page/loading-page.component';
 import { SetLampsComponent } from './set-lamps/set-lamps.component';
 import { SetBlindsComponent } from './set-blinds/set-blinds.component';
+import { DialogPopupComponent } from './gateway-selector/dialog-popup/dialog-popup.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: 'localhost', // 'mqtt.dev.iot.microlab',
@@ -30,9 +34,13 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     LoadingPageComponent,
     SetLampsComponent,
     SetBlindsComponent,
+    DialogPopupComponent,
   ],
   imports: [
     BrowserModule,
+    OverlayModule,
+    MatDialogModule,
+    BrowserAnimationsModule,
     RouterModule.forRoot([
       // {path: 'home-page', component: HomePageComponent},
       { path: '', component: FloorSelectorComponent },
@@ -47,7 +55,7 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     NgbModule,
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
   ],
-  providers: [Mqtt],
+  providers: [Mqtt, MatDialog],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
