@@ -1,0 +1,23 @@
+.backbutton {
+  size: 100;
+  position: absolute;
+  bottom: 0;
+}
+
+.back {
+  width: 235px;
+  height: 700px;
+}
+
+.centered {
+  width: 200px;
+  height: 100px;
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  margin: auto;
+}

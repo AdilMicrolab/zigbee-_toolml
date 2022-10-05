@@ -16,6 +16,7 @@ import { DialogPopupComponent } from './gateway-selector/dialog-popup/dialog-pop
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: 'localhost', // 'mqtt.dev.iot.microlab',
@@ -41,6 +42,7 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     OverlayModule,
     MatDialogModule,
     BrowserAnimationsModule,
+    MatProgressSpinnerModule,
     RouterModule.forRoot([
       // {path: 'home-page', component: HomePageComponent},
       { path: '', component: FloorSelectorComponent },

@@ -4,7 +4,12 @@ import { IMqttMessage } from 'ngx-mqtt';
 import { Subscription, takeUntil, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { DialogExample } from './dialog-popup/dialog-popup.component';
+import { DialogPopupComponent } from './dialog-popup/dialog-popup.component';
+interface deviceCountObject {
+  ids: string;
+  count: number;
+}
+
 @Component({
   templateUrl: './gateway-selector.component.html',
   styleUrls: ['./gateway-selector.component.css'],
@@ -30,8 +35,6 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.current_floor = this.floor_obj!['floor'];
     this.current_gateways = this.floor_obj!['gateways'];
-    console.log('test');
-    console.log(this.current_gateways);
     this.subscription = this.mqtt_sub
       .topic('zigbee/+/bridge/devices')
       .pipe(takeUntil(this.unSubscribe$))
@@ -47,15 +50,16 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
           ids: id,
           count: count,
         };
-        this.device_count.push(log_msg);
+        this.device_count.push(log_msg); // count of devices per..
         //this.device_count.sort();
-        this.build_gateway_structure(this.device_count, this.current_gateways);
+        this.build_gateway_structure(this.device_count, this.current_gateways); // give each gateway a count
         //force it to look at the start of a json
       });
   }
+
   build_gateway_structure(
-    item_count: Array<{ ids: string; count: number }>,
-    gateway_description: Array<any>
+    item_count: Array<deviceCountObject>,
+    gateway_description: any[]
   ) {
     this.full_gateway_description = [];
     console.log(gateway_description);
@@ -89,17 +93,30 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
       return false;
     }
   }
+  navigate_back() {
+    this.route.navigate(['floor-selector'], {
+      state: {},
+    });
+  }
   openDialog(
     enterAnimationDuration: string,
-    exitAnimationDuration: string
+    exitAnimationDuration: string,
+    event: any
   ): void {
-    console.log('clicked');
-    this.dialog.open(DialogExample, {
+    this.dialog.closeAll();
+    let cap_gateway = event.target.innerHTML
+      .trim()
+      .split('cap. ')[1]
+      .replace(')', '');
+    let clicked_gateway = event.target.innerHTML.trim().split('(')[0];
+    this.dialog.open(DialogPopupComponent, {
       width: '2500px',
+      data: [cap_gateway, clicked_gateway, this.current_floor],
       enterAnimationDuration,
       exitAnimationDuration,
     });
   }
+
   ngOnDestroy() {
     this.unSubscribe$.next('');
     this.unSubscribe$.complete();
