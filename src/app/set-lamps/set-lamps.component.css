@@ -1,0 +1,59 @@
+.centered {
+  width: 300px;
+  height: 400px;
+
+  position: absolute;
+  top: 200px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  margin: auto;
+  outline: 2px black solid;
+}
+.vert_cent {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  margin: auto;
+  /* outline: 2px black solid; */
+  text-align: center;
+  padding-left: 0px;
+}
+
+.next_device {
+  position: relative;
+  bottom: 0;
+}
+.finished {
+  width: 200px;
+}
+
+.top_center {
+  width: 100px;
+  height: 200px;
+  /* size: 10cm; */
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 550px;
+  left: 0;
+  right: 250px;
+  order: -1;
+  margin: auto;
+}
+.bottom_text {
+  width: 350px;
+  height: 200px;
+  /* size: 10cm; */
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 150px;
+  left: 0;
+  right: 0px;
+  margin: auto;
+}

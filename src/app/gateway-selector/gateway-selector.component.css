@@ -21,3 +21,29 @@
 
   margin: auto;
 }
+
+.top_center {
+  width: 100px;
+  height: 200px;
+  /* size: 10cm; */
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 400px;
+  left: 0;
+  right: 300px;
+  order: -1;
+  margin: auto;
+}
+.bottom_text {
+  width: 350px;
+  height: 200px;
+  /* size: 10cm; */
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 0px;
+  left: 0;
+  right: 50px;
+  margin: auto;
+}

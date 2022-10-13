@@ -5,6 +5,7 @@ import { Subscription, takeUntil, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogPopupComponent } from './dialog-popup/dialog-popup.component';
+
 interface deviceCountObject {
   ids: string;
   count: number;
@@ -30,11 +31,12 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
     private dialog: MatDialog
   ) {
     this.floor_obj = this.route.getCurrentNavigation()!.extras.state;
+    console.log(this.floor_obj);
   }
 
   ngOnInit(): void {
-    this.current_floor = this.floor_obj!['floor'];
-    this.current_gateways = this.floor_obj!['gateways'];
+    this.current_floor = this.floor_obj[0];
+    this.current_gateways = this.floor_obj[1];
     this.subscription = this.mqtt_sub
       .topic('zigbee/+/bridge/devices')
       .pipe(takeUntil(this.unSubscribe$))
@@ -62,14 +64,14 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
     gateway_description: any[]
   ) {
     this.full_gateway_description = [];
-    console.log(gateway_description);
+    // console.log(gateway_description);
     gateway_description.forEach((element) => {
       let gateway_id: string = element[0];
       let gateway_status = element[1];
-      console.log(gateway_id);
-      console.log(item_count);
+      // console.log(gateway_id);
+      // console.log(item_count);
       if (item_count.some((e) => e.ids == gateway_id)) {
-        console.log('gateway id has a count');
+        // console.log('gateway id has a count');
         let device_count_array = item_count.filter(
           (obj: { ids: string; count: number }) => {
             return obj.ids === gateway_id;
@@ -78,8 +80,8 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
         let pushmsg = [gateway_id, gateway_status, device_count_array.count];
         this.full_gateway_description.push(pushmsg);
       } else {
-        console.log('gateway has no count');
-        console.log(item_count['4']);
+        // console.log('gateway has no count');
+        // console.log(item_count['4']);
         let pushmsg = [gateway_id, gateway_status, NaN];
         this.full_gateway_description.push(pushmsg);
       }
@@ -87,7 +89,7 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
   }
   disable_gateways(gateway_status: string, gateway_cap: number) {
     let status = gateway_status.toLowerCase();
-    if (status == 'offline' || gateway_cap > 3) {
+    if (status == 'offline' || gateway_cap > 50) {
       return true;
     } else {
       return false;
@@ -110,8 +112,13 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
       .replace(')', '');
     let clicked_gateway = event.target.innerHTML.trim().split('(')[0];
     this.dialog.open(DialogPopupComponent, {
-      width: '2500px',
-      data: [cap_gateway, clicked_gateway, this.current_floor],
+      width: '1000px',
+      data: [
+        cap_gateway,
+        clicked_gateway,
+        this.current_floor,
+        this.current_gateways,
+      ],
       enterAnimationDuration,
       exitAnimationDuration,
     });

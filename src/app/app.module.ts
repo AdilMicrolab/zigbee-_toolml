@@ -17,7 +17,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PopuperrorComponent } from './set-lamps/popuperror/popuperror.component';
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: 'localhost', // 'mqtt.dev.iot.microlab',
   port: 8124,
@@ -27,7 +31,6 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
 @NgModule({
   declarations: [
     AppComponent,
-    // HomePageComponent,
     FloorSelectorComponent,
     GatewaySelectorComponent,
     DevicePageComponent,
@@ -36,13 +39,19 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     SetLampsComponent,
     SetBlindsComponent,
     DialogPopupComponent,
+    PopuperrorComponent,
   ],
   imports: [
     BrowserModule,
     OverlayModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
     MatDialogModule,
+    FormsModule,
     BrowserAnimationsModule,
     MatProgressSpinnerModule,
+    ReactiveFormsModule,
     RouterModule.forRoot([
       // {path: 'home-page', component: HomePageComponent},
       { path: '', component: FloorSelectorComponent },

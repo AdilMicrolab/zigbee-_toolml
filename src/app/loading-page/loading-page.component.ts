@@ -15,27 +15,38 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   ieee_addres: string = '';
   device_id: string = '';
   nav_page: string = '';
+  floor_gateway: string = '';
   constructor(private mqtt_sub: Mqtt, private route: Router) {
     this.routed_data = this.route.getCurrentNavigation()!.extras.state;
   }
 
   ngOnInit(): void {
     let clicked_gateway = this.routed_data[1].replace('Gateway ', '').trim();
-    console.log('ye');
-    let topic: string =
-      'zigbee/' + this.routed_data[2] + '_' + clicked_gateway + '/bridge/event';
+    this.floor_gateway = this.routed_data[2] + '_' + clicked_gateway;
+    let topic: string = 'zigbee/' + this.floor_gateway + '/bridge/event';
     console.log(topic);
+
+    this.subscription = this.mqtt_sub // this sub is to recount incase we added devices
+      .topic('zigbee/' + this.floor_gateway + '/bridge/devices')
+      .pipe(takeUntil(this.unSubscribe$))
+      .subscribe((message: IMqttMessage) => {
+        let msg: string = message.payload.toString();
+        let jsonmsg = JSON.parse(msg);
+        let count = Object.keys(jsonmsg).length;
+      });
+
     this.subscription = this.mqtt_sub
       .topic(topic)
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let jsonmsg = JSON.parse(msg);
-        console.log(jsonmsg);
-        this.ieee_addres = jsonmsg['ieee_address'];
-        this.device_id = jsonmsg['description'];
+        console.log('message');
+        console.log(jsonmsg['data']);
+        this.ieee_addres = jsonmsg['data']['ieee_address'];
+        this.device_id = jsonmsg['data']['definition']['description'];
         let type = jsonmsg['type'];
-        let status = jsonmsg['status'];
+        let status = jsonmsg['data']['status'];
         if (status == 'successful' && type == 'device_interview') {
           this.route_next_page(this.device_id, this.ieee_addres);
         }
@@ -44,16 +55,27 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
       });
   }
   route_next_page(id: string, i3_address: string) {
-    console.log(id);
     if (id.includes('Zigbee 3.0 universal LED-controller')) {
       this.nav_page = 'set-lamps';
       this.route.navigate([this.nav_page], {
-        state: [i3_address, id],
+        state: [
+          i3_address,
+          'lamp',
+          this.floor_gateway,
+          this.routed_data[0],
+          this.routed_data[3],
+        ],
       });
     } else if (id.includes('blind')) {
-      this.nav_page = 'set-blinds';
+      this.nav_page = 'set-lamps';
       this.route.navigate([this.nav_page], {
-        state: [i3_address, id],
+        state: [
+          i3_address,
+          'blind',
+          this.floor_gateway,
+          this.routed_data[0],
+          this.routed_data[3],
+        ],
       });
     } else {
       console.log('UNIDENTIFIED PRODUCT FOUND');

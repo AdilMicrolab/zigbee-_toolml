@@ -84,7 +84,7 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
     this.match_floors_gateways(gateway_info, this.floor_selec);
 
     this.route.navigate(['gateway-selector'], {
-      state: { floor: this.floor_selec, gateways: this.devices_selec },
+      state: [this.floor_selec, this.devices_selec],
     });
     //console.log(this.floor_selec);
   }

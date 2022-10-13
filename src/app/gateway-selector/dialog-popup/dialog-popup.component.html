@@ -1,10 +1,11 @@
-<h1 mat-dialog-title>Gateway Capacity {{ this.data[0] }} out of 50</h1>
+<h1 mat-dialog-title>Current Gateway Capacity {{ this.data[0] }}/50</h1>
 <div mat-dialog-content>
-  You're about to open {{ this.data[1] }} on floor {{ this.data[2] }}
+  You're about to open {{ this.data[1] }} on floor {{ this.data[2] }}.
+  <br />
   Are you sure?
 </div>
 <div mat-dialog-actions>
-  <button mat-button mat-dialog-close>cancel</button>
+  <button mat-button mat-dialog-close>Cancel</button>
   <button
     mat-button
     mat-dialog-close

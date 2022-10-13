@@ -4,6 +4,7 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
+import { Mqtt } from 'src/app/mqtt.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,15 +13,44 @@ import { Router } from '@angular/router';
   styleUrls: ['./dialog-popup.component.css'],
 })
 export class DialogPopupComponent implements OnInit {
+  gateway_array: [] = [];
+  selec_gateway: string = '';
+
   constructor(
     dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public route: Router
+    public route: Router,
+    private mqtt: Mqtt
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.selec_gateway = this.data[1].replace('Gateway ', '').trim();
+    this.gateway_array = this.data[3];
+  }
 
   route_set_page() {
+    this.gateway_array.forEach((array) => {
+      console.log('wtf  ', array);
+      if (array[0] == this.selec_gateway) {
+        this.mqtt.publish(
+          'zigbee/' +
+            this.data[2] +
+            '_' +
+            this.selec_gateway +
+            '/bridge/request/permit_join',
+          '{"value": true}'
+        );
+      } else {
+        this.mqtt.publish(
+          'zigbee/' +
+            this.data[2] +
+            '_' +
+            array[0] +
+            '/bridge/request/permit_join',
+          '{"value": false}'
+        );
+      }
+    });
     this.route.navigate(['loading-page'], {
       state: this.data,
     });
