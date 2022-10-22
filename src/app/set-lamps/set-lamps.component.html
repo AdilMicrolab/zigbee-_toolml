@@ -10,7 +10,7 @@
       <mat-label>Room Type</mat-label>
       <mat-select
         required
-        [(ngModel)]="selectedRoomtype"
+        [(ngModel)]="this.selectedRoomtype"
         name="type"
         #type="ngModel"
       >
@@ -28,7 +28,7 @@
       <mat-label>Room Number</mat-label>
       <mat-select
         required
-        [(ngModel)]="selectedOffice"
+        [(ngModel)]="this.selectedOffice"
         name="office"
         #office="ngModel"
       >
@@ -49,11 +49,12 @@
       <mat-label>{{ this.device_type | titlecase }}</mat-label>
       <mat-select
         required
-        [(ngModel)]="selectedDevice"
+        [(ngModel)]="this.selectedDevice"
         name="device"
         #device="ngModel"
-        placeholder="test123"
       >
+        <!-- [placeholder]="this.selectedDevice" -->
+
         <mat-option
           *ngFor="let number of this.numbers | slice: 1:20"
           [value]="number"

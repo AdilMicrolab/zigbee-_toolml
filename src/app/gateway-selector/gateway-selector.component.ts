@@ -31,19 +31,27 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
     private dialog: MatDialog
   ) {
     this.floor_obj = this.route.getCurrentNavigation()!.extras.state;
-    console.log(this.floor_obj);
+    // console.log(this.floor_obj);
   }
 
   ngOnInit(): void {
     this.current_floor = this.floor_obj[0];
     this.current_gateways = this.floor_obj[1];
+
+    this.current_gateways.forEach((gateway_array) =>
+      this.get_device_counts_raw(this.current_floor, gateway_array[0])
+    );
+    // this.current_gateways.forEach
+  }
+
+  get_device_counts_raw(floor: string, test: string) {
     this.subscription = this.mqtt_sub
-      .topic('zigbee/+/bridge/devices')
+      .topic('zigbee/' + floor + '_' + test + '/bridge/devices')
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let jsonmsg = JSON.parse(msg);
-        let count = Object.keys(jsonmsg).length;
+        let count = Object.keys(jsonmsg).length - 1; //  not sure why but it misscounts by 1
         let id = message.topic
           .replace('zigbee/', '')
           .replace('/bridge/devices', '')
@@ -52,13 +60,14 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
           ids: id,
           count: count,
         };
+        console.log('counts ', log_msg);
         this.device_count.push(log_msg); // count of devices per..
         //this.device_count.sort();
+        console.log(this.device_count);
         this.build_gateway_structure(this.device_count, this.current_gateways); // give each gateway a count
         //force it to look at the start of a json
       });
   }
-
   build_gateway_structure(
     item_count: Array<deviceCountObject>,
     gateway_description: any[]
@@ -89,7 +98,8 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
   }
   disable_gateways(gateway_status: string, gateway_cap: number) {
     let status = gateway_status.toLowerCase();
-    if (status == 'offline' || gateway_cap > 50) {
+    // TODO: set right amount
+    if (status == 'offline' || gateway_cap > 60) {
       return true;
     } else {
       return false;

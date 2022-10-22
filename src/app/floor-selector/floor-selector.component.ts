@@ -49,7 +49,7 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
         this.floor_list = [
           ...new Set(this.gateway_info.map((a: any) => a.floor)),
         ].sort();
-        console.log(this.gateway_info);
+        // console.log(this.gateway_info);
         // this._ref.detectChanges();
       });
     // this.mqtt_sub.publish('test', 'test');
@@ -59,10 +59,9 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
     selec_floor: string
   ) {
     this.devices_selec = [];
-    let floor: string = selec_floor;
     const devices = gateway_info.filter(
       (obj: { floor: string; gateway: string; status: string }) => {
-        return obj.floor === floor;
+        return obj.floor === selec_floor;
       }
     );
 
@@ -75,16 +74,15 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
   }
 
   Floor_selected(
-    event: any,
-    gateway_info: { floor: string; gateway: string; status: string }[]
+    gateway_info: { floor: string; gateway: string; status: string }[],
+    floor: any
   ) {
-    this.floor_selec = '';
-    this.floor_selec = event.target.innerHTML.trim();
-
-    this.match_floors_gateways(gateway_info, this.floor_selec);
+    // this.floor_selec = '';
+    // this.floor_selec = event.target.innerHTML.trim();
+    this.match_floors_gateways(gateway_info, floor);
 
     this.route.navigate(['gateway-selector'], {
-      state: [this.floor_selec, this.devices_selec],
+      state: [floor, this.devices_selec],
     });
     //console.log(this.floor_selec);
   }

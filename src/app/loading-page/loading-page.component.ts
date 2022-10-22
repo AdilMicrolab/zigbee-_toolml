@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription, takeUntil, Subject } from 'rxjs';
+import { Subscription, takeUntil, Subject, of } from 'rxjs';
+import { timeout, catchError } from 'rxjs/operators';
 import { Mqtt } from '../mqtt.service';
 import { IMqttMessage } from 'ngx-mqtt';
 import { Router } from '@angular/router';
@@ -16,6 +17,8 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   device_id: string = '';
   nav_page: string = '';
   floor_gateway: string = '';
+  count: number = 0;
+  status: string = '';
   constructor(private mqtt_sub: Mqtt, private route: Router) {
     this.routed_data = this.route.getCurrentNavigation()!.extras.state;
   }
@@ -25,56 +28,73 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
     this.floor_gateway = this.routed_data[2] + '_' + clicked_gateway;
     let topic: string = 'zigbee/' + this.floor_gateway + '/bridge/event';
     console.log(topic);
-
+    // TODO: remove this sub and just pass data through a service or dictionary
     this.subscription = this.mqtt_sub // this sub is to recount incase we added devices
       .topic('zigbee/' + this.floor_gateway + '/bridge/devices')
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let jsonmsg = JSON.parse(msg);
-        let count = Object.keys(jsonmsg).length;
+        this.count = Object.keys(jsonmsg).length;
       });
 
     this.subscription = this.mqtt_sub
       .topic(topic)
-      .pipe(takeUntil(this.unSubscribe$))
+      //TODO: set reasonable timeout
+      .pipe(takeUntil(this.unSubscribe$), timeout(600000))
+      .pipe(
+        catchError((err) => {
+          console.log(
+            'timeout, cant find any interviewed devices... \n closing gateway'
+          );
+          this.mqtt_sub.publish(
+            'zigbee/' + this.floor_gateway + '/bridge/request/permit_join',
+            '{"value": false}'
+          );
+          this.route.navigate(['floor-selector']);
+
+          throw 'error in source. Details: ' + err;
+        })
+      )
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let jsonmsg = JSON.parse(msg);
-        console.log('message');
-        console.log(jsonmsg['data']);
         this.ieee_addres = jsonmsg['data']['ieee_address'];
-        this.device_id = jsonmsg['data']['definition']['description'];
         let type = jsonmsg['type'];
-        let status = jsonmsg['data']['status'];
-        if (status == 'successful' && type == 'device_interview') {
+        this.status = jsonmsg['data']['status'];
+        if (type == 'device_announce') {
+          this.device_id = jsonmsg['data']['friendly_name'];
+          this.route_next_page(this.device_id, this.ieee_addres);
+        } else if (this.status == 'successful' && type == 'device_interview') {
+          this.device_id = jsonmsg['data']['definition']['description'];
           this.route_next_page(this.device_id, this.ieee_addres);
         }
         // give each gateway a count
         //force it to look at the start of a json
       });
   }
-  route_next_page(id: string, i3_address: string) {
-    if (id.includes('Zigbee 3.0 universal LED-controller')) {
+  route_next_page(id: string, ieee_addres: string) {
+    console.log(id);
+    if (id.includes('LED-controller') || id.includes('lamp')) {
       this.nav_page = 'set-lamps';
       this.route.navigate([this.nav_page], {
         state: [
-          i3_address,
+          ieee_addres,
           'lamp',
           this.floor_gateway,
-          this.routed_data[0],
-          this.routed_data[3],
+          this.routed_data[0], //gateway cap
+          this.routed_data[3], //gateway info
         ],
       });
     } else if (id.includes('blind')) {
       this.nav_page = 'set-lamps';
       this.route.navigate([this.nav_page], {
         state: [
-          i3_address,
+          ieee_addres,
           'blind',
           this.floor_gateway,
-          this.routed_data[0],
-          this.routed_data[3],
+          this.routed_data[0], //gateway cap
+          this.routed_data[3], //gateway info
         ],
       });
     } else {
@@ -83,6 +103,7 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    //TODO: maybe we can close the gateway already since device already added
     this.unSubscribe$.next('');
     this.unSubscribe$.complete();
   }

@@ -11,7 +11,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmPageComponent } from './confirm-page/confirm-page.component';
 import { LoadingPageComponent } from './loading-page/loading-page.component';
 import { SetLampsComponent } from './set-lamps/set-lamps.component';
-import { SetBlindsComponent } from './set-blinds/set-blinds.component';
 import { DialogPopupComponent } from './gateway-selector/dialog-popup/dialog-popup.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OverlayModule } from '@angular/cdk/overlay';
@@ -23,8 +22,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PopuperrorComponent } from './set-lamps/popuperror/popuperror.component';
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: 'localhost', // 'mqtt.dev.iot.microlab',
-  port: 8124,
+  hostname: '10.20.44.3', // 'localhost',
+  port: 8080, //8124 local
   path: '/mqtt',
 };
 
@@ -37,7 +36,6 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     ConfirmPageComponent,
     LoadingPageComponent,
     SetLampsComponent,
-    SetBlindsComponent,
     DialogPopupComponent,
     PopuperrorComponent,
   ],
@@ -61,7 +59,6 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
       { path: 'confirm-page', component: ConfirmPageComponent },
       { path: 'loading-page', component: LoadingPageComponent },
       { path: 'set-lamps', component: SetLampsComponent },
-      { path: 'set-blinds', component: SetBlindsComponent },
     ]),
     NgbModule,
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS),

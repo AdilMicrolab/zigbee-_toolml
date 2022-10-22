@@ -30,7 +30,7 @@ export class DialogPopupComponent implements OnInit {
 
   route_set_page() {
     this.gateway_array.forEach((array) => {
-      console.log('wtf  ', array);
+      console.log(array);
       if (array[0] == this.selec_gateway) {
         this.mqtt.publish(
           'zigbee/' +
@@ -38,7 +38,8 @@ export class DialogPopupComponent implements OnInit {
             '_' +
             this.selec_gateway +
             '/bridge/request/permit_join',
-          '{"value": true}'
+          '{"value": true, "time": 1800}'
+          // TODO: remove time to normal and check if next_device should restart timer
         );
       } else {
         this.mqtt.publish(

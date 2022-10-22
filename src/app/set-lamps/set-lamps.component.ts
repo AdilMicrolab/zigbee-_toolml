@@ -18,7 +18,7 @@ import { FormControl, FormGroup } from '@angular/forms';
   templateUrl: './set-lamps.component.html',
   styleUrls: ['./set-lamps.component.css'],
 })
-export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class SetLampsComponent implements OnInit, OnDestroy {
   ieee_address: string;
   device_type: string;
   floor_gateway: string;
@@ -39,6 +39,7 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
   click_source: string = '';
   gateway_cap: string = '';
   gateway_info: string = '';
+  friendly_name: string = '';
   form_group = new FormGroup({
     form_deviceid: new FormControl('test'),
   });
@@ -48,7 +49,6 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
     private mqtt_sub: Mqtt,
     private dialog: MatDialog
   ) {
-    //TODO: readd routed data
     let routed_data = this.route.getCurrentNavigation()!.extras.state as {
       [key: string]: any;
     };
@@ -85,10 +85,7 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   rename(event: any) {
     this.click_source = event.target.name;
-    console.log(this.click_source);
-    this.device_topic =
-      this.ieee_address +
-      ', "to": "' +
+    this.friendly_name =
       this.floor +
       '/' +
       this.selectedRoomtype +
@@ -97,7 +94,10 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
       '/' +
       this.device_type +
       this.selectedDevice;
-    console.log('Yaaaa', this.device_topic);
+
+    this.device_topic =
+      '"' + this.ieee_address + '"' + ', "to": "' + this.friendly_name;
+
     this.group_name =
       this.floor +
       '/' +
@@ -106,30 +106,36 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
       this.selectedOffice +
       '/group/' +
       this.group_tag;
-
-    this.rename_msg = '{"from":' + this.device_topic + '}';
+    this.group_check();
+    this.rename_msg = '{"from":' + this.device_topic + '"}';
     this.check_rename_response();
     this.mqtt_sub.publish(
-      'zigbee/' + this.floor_gateway + '/bridge/requests/device/rename',
+      'zigbee/' + this.floor_gateway + '/bridge/request/device/rename',
       this.rename_msg
     );
-    console.log(this.rename_msg);
+    console.log(this.friendly_name);
   }
 
   check_rename_response() {
+    console.log(
+      'zigbee/' + this.floor_gateway + '/bridge/response/device/rename'
+    );
     this.subscription = this.mqtt_sub
       .topic('zigbee/' + this.floor_gateway + '/bridge/response/device/rename')
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe(
         (message: IMqttMessage) => {
           let msg = JSON.parse(message.payload.toString());
-          console.log(msg['data']['to']);
-          console.log((this.rename_msg = msg['data']['to']));
-          if (msg['status'] == 'ok' && msg['data']['to'] == this.rename_msg) {
+          console.log('checking response...');
+          if (
+            msg['status'] == 'ok' &&
+            msg['data']['to'] == this.friendly_name
+          ) {
             console.log(
-              'we received a response after renaming to ' + this.rename_msg
+              'we received a response after renaming to ' + this.friendly_name
             );
-            this.group_check(); // check if group exists
+            console.log('previous name: ', msg['data']['from']);
+            // check if group exists
             if (!this.in_group) {
               // if doesnt exist
               this.group_add();
@@ -138,6 +144,7 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
             }
             this.device_add_group();
           } else {
+            //TODO: if there is no response, clear all subscriptions because it wont sub anymore
             console.log(
               'something went wrong with the response message of the device name'
             );
@@ -153,6 +160,8 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
+        console.log('the groups ', msg);
+        console.log('the group were looking for', this.group_name);
         if (this.ieee_address !== '' && msg.includes(this.group_name)) {
           this.in_group = true;
           console.log('group exists');
@@ -166,34 +175,57 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
   group_add() {
     let group_add_topic =
       'zigbee/' + this.floor_gateway + '/bridge/request/group/add';
-    console.log('publishing to ', group_add_topic, ' to ', this.group_name);
+    console.log('adding group ', this.group_name);
     this.mqtt_sub.publish(group_add_topic, this.group_name);
   }
   device_add_group() {
-    let friendly_name =
-      this.floor +
-      '/' +
-      this.selectedRoomtype +
-      '/' +
-      this.selectedOffice +
-      '/' +
-      this.device_type +
-      this.selectedDevice;
     let add_msg =
-      '{"group": ' + this.group_name + ', "device": ' + friendly_name + '}';
+      '{"group": ' +
+      '"' +
+      this.group_name +
+      '"' +
+      ', "device": ' +
+      '"' +
+      this.friendly_name +
+      '"' +
+      '}';
     let device_add_topic =
       'zigbee/' + this.floor_gateway + '/bridge/request/group/members/add';
-    console.log('adding device ', friendly_name, ' to ', this.group_name);
+    console.log('adding device ', this.friendly_name, ' to ', this.group_name);
     this.mqtt_sub.publish(device_add_topic, add_msg);
+    //TODO: could check if its already in group but it wouldnt matter too much
     this.route_next();
   }
-  route_next() {
+
+  sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  async route_next() {
     if (this.click_source == 'nextdevice') {
-      //TODO: send on and off to device to test it
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name,
+        '{"state": on}'
+      );
+      await this.sleep(2000);
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name,
+        '{"state": off}'
+      );
+      await this.sleep(2000);
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name,
+        '{"state": on}'
+      );
+
       this.route.navigate(['loading-page'], {
         state: [this.gateway_cap, this.gateway, this.floor, this.gateway_info],
       });
     } else if (this.click_source == 'finisheddevice') {
+      let gateway_topic =
+        'zigbee/' + this.floor_gateway + '/bridge/request/permit_join';
+
+      this.mqtt_sub.publish(gateway_topic, '{"value": false}');
+      console.log('closing gateway at ', gateway_topic);
       this.route.navigate(['gateway-selector'], {
         state: [this.floor, this.gateway_info],
       });
@@ -223,11 +255,7 @@ export class SetLampsComponent implements OnInit, OnDestroy, AfterViewInit {
       });
     }
   }
-  ngAfterViewInit(): void {
-    // TODO: Remove
-  }
   ngOnDestroy(): void {
-    //TODO: close gateway
     this.unSubscribe$.next('');
     this.unSubscribe$.complete();
   }
