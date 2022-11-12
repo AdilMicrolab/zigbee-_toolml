@@ -77,8 +77,6 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
     gateway_info: { floor: string; gateway: string; status: string }[],
     floor: any
   ) {
-    // this.floor_selec = '';
-    // this.floor_selec = event.target.innerHTML.trim();
     this.match_floors_gateways(gateway_info, floor);
 
     this.route.navigate(['gateway-selector'], {

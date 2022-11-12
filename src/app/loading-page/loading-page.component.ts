@@ -35,7 +35,7 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let jsonmsg = JSON.parse(msg);
-        this.count = Object.keys(jsonmsg).length;
+        this.count = Object.keys(jsonmsg).length - 1;
       });
 
     this.subscription = this.mqtt_sub

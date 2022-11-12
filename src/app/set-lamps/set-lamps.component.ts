@@ -40,10 +40,10 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   gateway_cap: string = '';
   gateway_info: string = '';
   friendly_name: string = '';
-  form_group = new FormGroup({
-    form_deviceid: new FormControl('test'),
-  });
-  name = new FormControl('test');
+  // form_group = new FormGroup({
+  //   form_deviceid: new FormControl('test'),
+  // });
+  // name = new FormControl('test');
   constructor(
     private route: Router,
     private mqtt_sub: Mqtt,
@@ -175,7 +175,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   group_add() {
     let group_add_topic =
       'zigbee/' + this.floor_gateway + '/bridge/request/group/add';
-    console.log('adding group ', this.group_name);
+    console.log('adding group', this.group_name);
     this.mqtt_sub.publish(group_add_topic, this.group_name);
   }
   device_add_group() {
