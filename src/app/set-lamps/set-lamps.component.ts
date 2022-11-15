@@ -210,26 +210,52 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
   async route_next() {
+    console.log(' the click source is    ', this.click_source);
     if (this.click_source == 'nextdevice') {
+      console.log('turning on and off');
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name,
-        '{"state": on}'
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "OFF"}'
       );
-      await this.sleep(2000);
+      await this.sleep(300);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name,
-        '{"state": off}'
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "ON"}'
       );
-      await this.sleep(2000);
+      await this.sleep(300);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name,
-        '{"state": on}'
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "OFF"}'
       );
-
+      await this.sleep(300);
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "ON"}'
+      );
       this.route.navigate(['loading-page'], {
         state: [this.gateway_cap, this.gateway, this.floor, this.gateway_info],
       });
     } else if (this.click_source == 'finisheddevice') {
+      console.log('turning on and off');
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "OFF"}'
+      );
+      await this.sleep(300);
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "ON"}'
+      );
+      await this.sleep(300);
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "OFF"}'
+      );
+      await this.sleep(300);
+      this.mqtt_sub.publish(
+        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        '{"state": "ON"}'
+      );
       let gateway_topic =
         'zigbee/' + this.floor_gateway + '/bridge/request/permit_join';
 

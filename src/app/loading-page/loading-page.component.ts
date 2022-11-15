@@ -62,7 +62,9 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
         let jsonmsg = JSON.parse(msg);
         this.ieee_addres = jsonmsg['data']['ieee_address'];
         let type = jsonmsg['type'];
+        console.log(jsonmsg);
         this.status = jsonmsg['data']['status'];
+        console.log('status: ', this.status, ' \n type:', type);
         if (type == 'device_announce') {
           this.device_id = jsonmsg['data']['friendly_name'];
           this.route_next_page(this.device_id, this.ieee_addres);
