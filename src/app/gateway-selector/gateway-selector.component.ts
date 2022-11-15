@@ -19,7 +19,7 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
   current_floor: string = '';
   current_gateways: Array<string> = [];
   floor_obj: any;
-  max_capacity: number = 50;
+  max_capacity: number = 60;
   subscription!: Subscription;
   unSubscribe$ = new Subject();
   full_gateway_description: Array<any> = [];
@@ -37,7 +37,7 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.current_floor = this.floor_obj[0];
     this.current_gateways = this.floor_obj[1];
-
+    console.log(this.current_gateways, 'we want thisssss');
     this.current_gateways.forEach((gateway_array) =>
       this.get_device_counts_raw(this.current_floor, gateway_array[0])
     );
@@ -60,7 +60,6 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
           ids: id,
           count: count,
         };
-        console.log('counts ', log_msg);
         this.device_count.push(log_msg); // count of devices per..
         //this.device_count.sort();
         console.log(this.device_count);
@@ -99,7 +98,7 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
   disable_gateways(gateway_status: string, gateway_cap: number) {
     let status = gateway_status.toLowerCase();
     // TODO: set right amount
-    if (status == 'offline' || gateway_cap > 60) {
+    if (status == 'offline' || gateway_cap > this.max_capacity) {
       return true;
     } else {
       return false;
@@ -127,7 +126,7 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
         cap_gateway,
         clicked_gateway,
         this.current_floor,
-        this.current_gateways,
+        this.current_gateways, //gatewayid + state
       ],
       enterAnimationDuration,
       exitAnimationDuration,

@@ -24,6 +24,7 @@ export class DialogPopupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('test', this.data);
     this.selec_gateway = this.data[1].replace('Gateway ', '').trim();
     this.gateway_array = this.data[3];
   }

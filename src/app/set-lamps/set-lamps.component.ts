@@ -12,6 +12,7 @@ import { Subscription, takeUntil, Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PopuperrorComponent } from './popuperror/popuperror.component';
 import { FormControl, FormGroup } from '@angular/forms';
+import { computeStyles } from '@popperjs/core';
 
 @Component({
   selector: 'app-set-lamps',
@@ -52,7 +53,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     let routed_data = this.route.getCurrentNavigation()!.extras.state as {
       [key: string]: any;
     };
-    // let routed_data = ['0x84fd27fffe78b755', 'lamp', '10_1'];
+    // let routed_data = ['0x84fd27fffe78b755', 'lamp', '10_1', 43, []];
     this.ieee_address = routed_data[0];
     this.device_type = routed_data[1];
     this.floor_gateway = routed_data[2];
@@ -126,6 +127,8 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       .subscribe(
         (message: IMqttMessage) => {
           let msg = JSON.parse(message.payload.toString());
+          console.log(msg['error']);
+          console.log(msg['status']);
           console.log('checking response...');
           if (
             msg['status'] == 'ok' &&
@@ -142,6 +145,12 @@ export class SetLampsComponent implements OnInit, OnDestroy {
             } else {
               console.log('group already exists');
             }
+            this.device_add_group();
+          } else if (
+            msg['status'] == 'error' &&
+            msg['error'].includes('already in use')
+          ) {
+            console.log('already in use name');
             this.device_add_group();
           } else {
             //TODO: if there is no response, clear all subscriptions because it wont sub anymore

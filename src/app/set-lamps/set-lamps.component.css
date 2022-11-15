@@ -11,6 +11,21 @@
   margin: auto;
   outline: 2px black solid;
 }
+
+.centered_blinds {
+  width: 100px;
+  height: 200px;
+  /* size: 10cm; */
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 550px;
+  left: 0;
+  right: 600px;
+  order: -1;
+  margin: auto;
+}
+
 .vert_cent {
   position: relative;
   top: 0;
