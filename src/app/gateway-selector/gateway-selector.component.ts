@@ -112,14 +112,12 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
   openDialog(
     enterAnimationDuration: string,
     exitAnimationDuration: string,
-    event: any
+    gateway_info: any
   ): void {
     this.dialog.closeAll();
-    let cap_gateway = event.target.innerHTML
-      .trim()
-      .split('cap. ')[1]
-      .replace(')', '');
-    let clicked_gateway = event.target.innerHTML.trim().split('(')[0];
+    console.log('testtt', gateway_info);
+    let cap_gateway = gateway_info[2];
+    let clicked_gateway = gateway_info[0];
     this.dialog.open(DialogPopupComponent, {
       width: '1000px',
       data: [

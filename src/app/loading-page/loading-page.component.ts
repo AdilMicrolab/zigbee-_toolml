@@ -24,7 +24,7 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log(this.routed_data);
+    console.log('all data', this.routed_data);
     let clicked_gateway = this.routed_data[1].replace('Gateway ', '').trim(); //TODO: OMG THIS NEEDS TO GO
     this.floor_gateway = this.routed_data[2] + '_' + clicked_gateway;
     let topic: string = 'zigbee/' + this.floor_gateway + '/bridge/event';
@@ -104,14 +104,23 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   }
 
   navigate_back() {
+    let gateway_selected = this.routed_data[1];
     let floor = this.routed_data[2];
     let gateway_state = this.routed_data[3];
+    this.mqtt_sub.publish(
+      'zigbee/' +
+        floor +
+        '_' +
+        gateway_selected +
+        '/bridge/request/permit_join',
+      '{"value": false}'
+    );
+    // closing off the gateway before we return
     this.route.navigate(['gateway-selector'], {
       state: [floor, gateway_state],
     });
   }
   ngOnDestroy(): void {
-    //TODO: maybe we can close the gateway already since device already added
     this.unSubscribe$.next('');
     this.unSubscribe$.complete();
   }
