@@ -111,7 +111,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     this.rename_msg = '{"from":' + this.device_topic + '"}';
     this.check_rename_response();
     this.mqtt_sub.publish(
-      'zigbee/' + this.floor_gateway + '/bridge/request/device/rename',
+      'rb/sateraito/' + this.floor_gateway + '/bridge/request/device/rename',
       this.rename_msg
     );
     console.log(this.friendly_name);
@@ -119,10 +119,12 @@ export class SetLampsComponent implements OnInit, OnDestroy {
 
   check_rename_response() {
     console.log(
-      'zigbee/' + this.floor_gateway + '/bridge/response/device/rename'
+      'rb/sateraito/' + this.floor_gateway + '/bridge/response/device/rename'
     );
     this.subscription = this.mqtt_sub
-      .topic('zigbee/' + this.floor_gateway + '/bridge/response/device/rename')
+      .topic(
+        'rb/sateraito/' + this.floor_gateway + '/bridge/response/device/rename'
+      )
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe(
         (message: IMqttMessage) => {
@@ -165,7 +167,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   }
   group_check() {
     this.subscription = this.mqtt_sub
-      .topic('zigbee/' + this.floor_gateway + '/bridge/groups')
+      .topic('rb/sateraito/' + this.floor_gateway + '/bridge/groups')
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
@@ -183,7 +185,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
 
   group_add() {
     let group_add_topic =
-      'zigbee/' + this.floor_gateway + '/bridge/request/group/add';
+      'rb/sateraito/' + this.floor_gateway + '/bridge/request/group/add';
     console.log('adding group', this.group_name);
     this.mqtt_sub.publish(group_add_topic, this.group_name);
   }
@@ -199,7 +201,9 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       '"' +
       '}';
     let device_add_topic =
-      'zigbee/' + this.floor_gateway + '/bridge/request/group/members/add';
+      'rb/sateraito/' +
+      this.floor_gateway +
+      '/bridge/request/group/members/add';
     console.log('adding device ', this.friendly_name, ' to ', this.group_name);
     this.mqtt_sub.publish(device_add_topic, add_msg);
     //TODO: could check if its already in group but it wouldnt matter too much
@@ -214,22 +218,38 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     if (this.click_source == 'nextdevice') {
       console.log('turning on and off');
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "OFF"}'
       );
       await this.sleep(1000);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "ON"}'
       );
       await this.sleep(1000);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "OFF"}'
       );
       await this.sleep(1000);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "ON"}'
       );
       this.route.navigate(['loading-page'], {
@@ -238,26 +258,42 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     } else if (this.click_source == 'finisheddevice') {
       console.log('turning on and off');
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "OFF"}'
       );
       await this.sleep(1000);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "ON"}'
       );
       await this.sleep(1000);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "OFF"}'
       );
       await this.sleep(1000);
       this.mqtt_sub.publish(
-        'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
+        'rb/sateraito/' +
+          this.floor_gateway +
+          '/' +
+          this.friendly_name +
+          '/set',
         '{"state": "ON"}'
       );
       let gateway_topic =
-        'zigbee/' + this.floor_gateway + '/bridge/request/permit_join';
+        'rb/sateraito/' + this.floor_gateway + '/bridge/request/permit_join';
 
       this.mqtt_sub.publish(gateway_topic, '{"value": false}');
       console.log('closing gateway at ', gateway_topic);

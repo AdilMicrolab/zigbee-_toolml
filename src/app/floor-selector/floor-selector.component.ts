@@ -28,13 +28,13 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('15/11/2022 version');
     this.subscription = this.mqtt_sub
-      .topic('zigbee/+/bridge/state')
+      .topic('rb/sateraito/zigbee/+/bridge/state')
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let full_topic: string = message.topic;
         let info_array: string[] = full_topic
-          .replace('zigbee/', '')
+          .replace('rb/sateraito/zigbee/', '')
           .replace('/bridge/state', '')
           .split('_');
         this.current_floor = info_array[0];

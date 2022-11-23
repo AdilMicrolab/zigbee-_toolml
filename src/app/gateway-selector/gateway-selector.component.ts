@@ -46,14 +46,14 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
 
   get_device_counts_raw(floor: string, test: string) {
     this.subscription = this.mqtt_sub
-      .topic('zigbee/' + floor + '_' + test + '/bridge/devices')
+      .topic('rb/sateraito/' + floor + '_' + test + '/bridge/devices')
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
         let jsonmsg = JSON.parse(msg);
         let count = Object.keys(jsonmsg).length - 1; //  not sure why but it misscounts by 1
         let id = message.topic
-          .replace('zigbee/', '')
+          .replace('rb/sateraito/', '')
           .replace('/bridge/devices', '')
           .split('_')[1];
         let log_msg = {

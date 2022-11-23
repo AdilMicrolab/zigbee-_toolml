@@ -1,18 +1,16 @@
-
 mqtt:
   broker: "mqtt.prod.iot.microlab"
-  prefix: 'rb'
-  subs: 
-    - 'zigbee/+/bridge/state'
-    - 'zigbee/+/+/devices'
-    - 'zigbee/{Selec_gateway}/bridge/groups'
-    - 'zigbee/{Selec_gateway}/bridge/event'
+  prefix: "rb"
+  subs:
+    - "rb/sateraito/+/bridge/state"
+    - "rb/sateraito/+/+/devices"
+    - "rb/sateraito/{Selec_gateway}/bridge/groups"
+    - "rb/sateraito/{Selec_gateway}/bridge/event"
   # selec_gateway in the form of 13_1, 13_2 etc. floor preceding gateway ID
   pubs:
-    - 'zigbee/{Selec_gateway}/bridge/request/group/add'
-    - 'zigbee/{selec_gateway}/bridge/request/group/members/add'
-    - 'zigbee/{Selec_gateway}/bridge/request/permit_join'
-
+    - "rb/sateraito/{Selec_gateway}/bridge/request/group/add"
+    - "rb/sateraito/{selec_gateway}/bridge/request/group/members/add"
+    - "rb/sateraito/{Selec_gateway}/bridge/request/permit_join"
 
 # specific timers, short long and default
 space_types:

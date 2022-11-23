@@ -34,7 +34,7 @@ export class DialogPopupComponent implements OnInit {
       console.log(array);
       if (array[0] == this.selec_gateway) {
         this.mqtt.publish(
-          'zigbee/' +
+          'rb/sateraito/' +
             this.data[2] +
             '_' +
             this.selec_gateway +
@@ -44,7 +44,7 @@ export class DialogPopupComponent implements OnInit {
         );
       } else {
         this.mqtt.publish(
-          'zigbee/' +
+          'rb/sateraito/' +
             this.data[2] +
             '_' +
             array[0] +
