@@ -78,7 +78,7 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   }
   route_next_page(id: string, ieee_addres: string) {
     console.log(id);
-    if (id.includes('LED-controller') || id.includes('lamp')) {
+    if (id.includes('LED') || id.includes('lamp')) {
       this.nav_page = 'set-lamps';
       this.route.navigate([this.nav_page], {
         state: [

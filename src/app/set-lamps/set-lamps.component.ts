@@ -217,17 +217,17 @@ export class SetLampsComponent implements OnInit, OnDestroy {
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "OFF"}'
       );
-      await this.sleep(300);
+      await this.sleep(1000);
       this.mqtt_sub.publish(
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "ON"}'
       );
-      await this.sleep(300);
+      await this.sleep(1000);
       this.mqtt_sub.publish(
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "OFF"}'
       );
-      await this.sleep(300);
+      await this.sleep(1000);
       this.mqtt_sub.publish(
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "ON"}'
@@ -241,17 +241,17 @@ export class SetLampsComponent implements OnInit, OnDestroy {
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "OFF"}'
       );
-      await this.sleep(300);
+      await this.sleep(1000);
       this.mqtt_sub.publish(
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "ON"}'
       );
-      await this.sleep(300);
+      await this.sleep(1000);
       this.mqtt_sub.publish(
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "OFF"}'
       );
-      await this.sleep(300);
+      await this.sleep(1000);
       this.mqtt_sub.publish(
         'zigbee/' + this.floor_gateway + '/' + this.friendly_name + '/set',
         '{"state": "ON"}'

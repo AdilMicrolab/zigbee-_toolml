@@ -26,6 +26,7 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    console.log('15/11/2022 version');
     this.subscription = this.mqtt_sub
       .topic('zigbee/+/bridge/state')
       .pipe(takeUntil(this.unSubscribe$))
