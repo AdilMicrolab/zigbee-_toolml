@@ -4,6 +4,7 @@ import { timeout, catchError } from 'rxjs/operators';
 import { Mqtt } from '../mqtt.service';
 import { IMqttMessage } from 'ngx-mqtt';
 import { Router } from '@angular/router';
+import { building_info } from '../environments/environment';
 @Component({
   selector: 'app-loading-page',
   templateUrl: './loading-page.component.html',
@@ -26,12 +27,19 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('all data', this.routed_data);
     let clicked_gateway = this.routed_data[1].replace('Gateway ', '').trim(); //TODO: OMG THIS NEEDS TO GO
-    this.floor_gateway = this.routed_data[2] + '_' + clicked_gateway;
-    let topic: string = 'zigbee/' + this.floor_gateway + '/bridge/event';
+    this.floor_gateway = this.routed_data[2] + '/' + clicked_gateway;
+    let topic: string =
+      building_info.building_sateraito_prefix +
+      this.floor_gateway +
+      '/bridge/event';
     console.log(topic);
     // TODO: remove this sub and just pass data through a service or dictionary
     this.subscription = this.mqtt_sub // this sub is to recount incase we added devices
-      .topic('zigbee/' + this.floor_gateway + '/bridge/devices')
+      .topic(
+        building_info.building_sateraito_prefix +
+          this.floor_gateway +
+          '/bridge/devices'
+      )
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
@@ -49,7 +57,9 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
             'timeout, cant find any interviewed devices... \n closing gateway'
           );
           this.mqtt_sub.publish(
-            'zigbee/' + this.floor_gateway + '/bridge/request/permit_join',
+            building_info.building_sateraito_prefix +
+              this.floor_gateway +
+              '/bridge/request/permit_join',
             '{"value": false}'
           );
           this.route.navigate(['floor-selector']);
@@ -110,9 +120,9 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
     let floor = this.routed_data[2];
     let gateway_state = this.routed_data[3];
     this.mqtt_sub.publish(
-      'zigbee/' +
+      building_info.building_sateraito_prefix +
         floor +
-        '_' +
+        '/' +
         gateway_selected +
         '/bridge/request/permit_join',
       '{"value": false}'

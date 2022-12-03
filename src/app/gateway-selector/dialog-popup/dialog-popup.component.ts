@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import {
   MatDialog,
   MatDialogRef,
@@ -6,6 +6,7 @@ import {
 } from '@angular/material/dialog';
 import { Mqtt } from 'src/app/mqtt.service';
 import { Router } from '@angular/router';
+import { building_info } from 'src/app/environments/environment';
 
 @Component({
   selector: 'app-dialog-popup',
@@ -34,9 +35,9 @@ export class DialogPopupComponent implements OnInit {
       console.log(array);
       if (array[0] == this.selec_gateway) {
         this.mqtt.publish(
-          'rb/sateraito/' +
+          building_info.building_sateraito_prefix +
             this.data[2] +
-            '_' +
+            '/' +
             this.selec_gateway +
             '/bridge/request/permit_join',
           '{"value": true, "time": 1800}'
@@ -44,9 +45,9 @@ export class DialogPopupComponent implements OnInit {
         );
       } else {
         this.mqtt.publish(
-          'rb/sateraito/' +
+          building_info.building_sateraito_prefix +
             this.data[2] +
-            '_' +
+            '/' +
             array[0] +
             '/bridge/request/permit_join',
           '{"value": false}'

@@ -3,6 +3,7 @@ import { Mqtt } from 'src/app/mqtt.service';
 import { IMqttMessage } from 'ngx-mqtt';
 import { Router } from '@angular/router';
 import { Subscription, takeUntil, Subject } from 'rxjs';
+import { building_info } from 'src/app/environments/environment';
 
 @Component({
   templateUrl: './floor-selector.component.html',
@@ -26,17 +27,22 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('15/11/2022 version');
+    console.log('03/12/2022 version');
+    let sateraito_topic: string =
+      building_info.building_sateraito_prefix + '+/+/bridge/state';
+    console.log(sateraito_topic);
     this.subscription = this.mqtt_sub
-      .topic('rb/sateraito/zigbee/+/bridge/state')
+      // .topic(building_info.building_sateraito_prefix + '+/+/bridge/state')
+      .topic(sateraito_topic)
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
+        console.log(msg);
         let full_topic: string = message.topic;
         let info_array: string[] = full_topic
-          .replace('rb/sateraito/zigbee/', '')
+          .replace(building_info.building_sateraito_prefix, '')
           .replace('/bridge/state', '')
-          .split('_');
+          .split('/');
         this.current_floor = info_array[0];
         this.current_gateway = info_array[1];
         let log_msg = {

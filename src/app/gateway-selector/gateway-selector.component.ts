@@ -5,6 +5,7 @@ import { Subscription, takeUntil, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogPopupComponent } from './dialog-popup/dialog-popup.component';
+import { building_info } from 'src/app/environments/environment';
 
 interface deviceCountObject {
   ids: string;
@@ -33,7 +34,7 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
     this.floor_obj = this.route.getCurrentNavigation()!.extras.state;
     // console.log(this.floor_obj);
   }
-
+  //TODO: DROP DUPLICATES IN GATEWAY ARRAY
   ngOnInit(): void {
     this.current_floor = this.floor_obj[0];
     this.current_gateways = this.floor_obj[1];
@@ -44,18 +45,27 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
     // this.current_gateways.forEach
   }
 
-  get_device_counts_raw(floor: string, test: string) {
+  get_device_counts_raw(floor: string, sateraito: string) {
+    let topic_devices: string =
+      building_info.building_sateraito_prefix +
+      floor +
+      '/' +
+      sateraito + //id of sateraito
+      '/bridge/devices';
+    console.log('topic ', topic_devices);
     this.subscription = this.mqtt_sub
-      .topic('rb/sateraito/' + floor + '_' + test + '/bridge/devices')
+      .topic(topic_devices)
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
+        console.log(msg);
         let jsonmsg = JSON.parse(msg);
         let count = Object.keys(jsonmsg).length - 1; //  not sure why but it misscounts by 1
+        let prefix: string = building_info.building_sateraito_prefix;
         let id = message.topic
-          .replace('rb/sateraito/', '')
+          .replace(prefix, '')
           .replace('/bridge/devices', '')
-          .split('_')[1];
+          .split('/')[1];
         let log_msg = {
           ids: id,
           count: count,
@@ -78,6 +88,7 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
       let gateway_status = element[1];
       // console.log(gateway_id);
       // console.log(item_count);
+      let t = {};
       if (item_count.some((e) => e.ids == gateway_id)) {
         // console.log('gateway id has a count');
         let device_count_array = item_count.filter(
@@ -87,11 +98,18 @@ export class GatewaySelectorComponent implements OnInit, OnDestroy {
         )[0];
         let pushmsg = [gateway_id, gateway_status, device_count_array.count];
         this.full_gateway_description.push(pushmsg);
+        this.full_gateway_description.filter(
+          ((t = {}), (a) => !(t[a] = a in t))
+        );
       } else {
         // console.log('gateway has no count');
         // console.log(item_count['4']);
         let pushmsg = [gateway_id, gateway_status, NaN];
         this.full_gateway_description.push(pushmsg);
+        this.full_gateway_description.filter(
+          ((t = {}), (a) => !(t[a] = a in t))
+        );
+        console.log(' drop duplicates here', this.full_gateway_description);
       }
     });
   }

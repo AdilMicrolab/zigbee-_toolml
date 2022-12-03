@@ -11,8 +11,7 @@ import { IMqttMessage } from 'ngx-mqtt';
 import { Subscription, takeUntil, Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PopuperrorComponent } from './popuperror/popuperror.component';
-import { FormControl, FormGroup } from '@angular/forms';
-import { computeStyles } from '@popperjs/core';
+import { building_info } from 'src/app/environments/environment';
 
 @Component({
   selector: 'app-set-lamps',
@@ -70,8 +69,8 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.floor = this.floor_gateway.split('_')[0];
-    this.gateway = this.floor_gateway.split('_')[1];
+    this.floor = this.floor_gateway.split('/')[0];
+    this.gateway = this.floor_gateway.split('/')[1];
     let range_numbers = [...Array(99).keys()];
     range_numbers.forEach((myNumber) => {
       let formattedNumber = myNumber.toLocaleString('en-US', {
@@ -87,8 +86,8 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   rename(event: any) {
     this.click_source = event.target.name;
     this.friendly_name =
-      this.floor +
-      '/' +
+      // this.floor +
+      // '/' +
       this.selectedRoomtype +
       '/' +
       this.selectedOffice +
@@ -100,8 +99,8 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       '"' + this.ieee_address + '"' + ', "to": "' + this.friendly_name;
 
     this.group_name =
-      this.floor +
-      '/' +
+      // this.floor +
+      // '/' +
       this.selectedRoomtype +
       '/' +
       this.selectedOffice +
@@ -111,7 +110,9 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     this.rename_msg = '{"from":' + this.device_topic + '"}';
     this.check_rename_response();
     this.mqtt_sub.publish(
-      'rb/sateraito/' + this.floor_gateway + '/bridge/request/device/rename',
+      building_info.building_sateraito_prefix +
+        this.floor_gateway +
+        '/bridge/request/device/rename',
       this.rename_msg
     );
     console.log(this.friendly_name);
@@ -119,11 +120,15 @@ export class SetLampsComponent implements OnInit, OnDestroy {
 
   check_rename_response() {
     console.log(
-      'rb/sateraito/' + this.floor_gateway + '/bridge/response/device/rename'
+      building_info.building_sateraito_prefix +
+        this.floor_gateway +
+        '/bridge/response/device/rename'
     );
     this.subscription = this.mqtt_sub
       .topic(
-        'rb/sateraito/' + this.floor_gateway + '/bridge/response/device/rename'
+        building_info.building_sateraito_prefix +
+          this.floor_gateway +
+          '/bridge/response/device/rename'
       )
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe(
@@ -167,7 +172,11 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   }
   group_check() {
     this.subscription = this.mqtt_sub
-      .topic('rb/sateraito/' + this.floor_gateway + '/bridge/groups')
+      .topic(
+        building_info.building_sateraito_prefix +
+          this.floor_gateway +
+          '/bridge/groups'
+      )
       .pipe(takeUntil(this.unSubscribe$))
       .subscribe((message: IMqttMessage) => {
         let msg: string = message.payload.toString();
@@ -185,7 +194,9 @@ export class SetLampsComponent implements OnInit, OnDestroy {
 
   group_add() {
     let group_add_topic =
-      'rb/sateraito/' + this.floor_gateway + '/bridge/request/group/add';
+      building_info.building_sateraito_prefix +
+      this.floor_gateway +
+      '/bridge/request/group/add';
     console.log('adding group', this.group_name);
     this.mqtt_sub.publish(group_add_topic, this.group_name);
   }
@@ -201,7 +212,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       '"' +
       '}';
     let device_add_topic =
-      'rb/sateraito/' +
+      building_info.building_sateraito_prefix +
       this.floor_gateway +
       '/bridge/request/group/members/add';
     console.log('adding device ', this.friendly_name, ' to ', this.group_name);
@@ -213,88 +224,41 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  async route_next() {
+
+  async turn_on_and_off() {
+    console.log('turning on and off');
+    let friendly_name_no_building = this.friendly_name.replace(this.floor, '');
+    // above line removes from e.g. 13/office/12/
+    for (let step = 0; step < 5; step++) {
+      this.mqtt_sub.publish(
+        building_info.building_sateraito_prefix +
+          this.floor_gateway +
+          friendly_name_no_building +
+          '/set',
+        '{"state": "OFF"}'
+      );
+      await this.sleep(1000);
+      this.mqtt_sub.publish(
+        building_info.building_sateraito_prefix +
+          this.floor_gateway +
+          friendly_name_no_building +
+          '/set',
+        '{"state": "ON"}'
+      );
+    }
+  }
+  route_next() {
     console.log(' the click source is    ', this.click_source);
+    this.turn_on_and_off();
     if (this.click_source == 'nextdevice') {
-      console.log('turning on and off');
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "OFF"}'
-      );
-      await this.sleep(1000);
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "ON"}'
-      );
-      await this.sleep(1000);
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "OFF"}'
-      );
-      await this.sleep(1000);
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "ON"}'
-      );
       this.route.navigate(['loading-page'], {
         state: [this.gateway_cap, this.gateway, this.floor, this.gateway_info],
       });
     } else if (this.click_source == 'finisheddevice') {
-      console.log('turning on and off');
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "OFF"}'
-      );
-      await this.sleep(1000);
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "ON"}'
-      );
-      await this.sleep(1000);
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "OFF"}'
-      );
-      await this.sleep(1000);
-      this.mqtt_sub.publish(
-        'rb/sateraito/' +
-          this.floor_gateway +
-          '/' +
-          this.friendly_name +
-          '/set',
-        '{"state": "ON"}'
-      );
       let gateway_topic =
-        'rb/sateraito/' + this.floor_gateway + '/bridge/request/permit_join';
-
+        building_info.building_sateraito_prefix +
+        this.floor_gateway +
+        '/bridge/request/permit_join';
       this.mqtt_sub.publish(gateway_topic, '{"value": false}');
       console.log('closing gateway at ', gateway_topic);
       this.route.navigate(['gateway-selector'], {

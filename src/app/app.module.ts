@@ -21,11 +21,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PopuperrorComponent } from './set-lamps/popuperror/popuperror.component';
-export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: '10.20.44.3', // 'localhost',
-  port: 8080, //8124 local
-  path: '/mqtt',
-};
+import { MQTT_SERVICE_OPTIONS } from './environments/environment';
 
 @NgModule({
   declarations: [

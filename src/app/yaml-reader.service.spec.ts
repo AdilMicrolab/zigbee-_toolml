@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { YamlReaderService } from './yaml-reader.service';
+import { GetYamlService } from './yaml-reader.service';
 
 describe('YamlReaderService', () => {
-  let service: YamlReaderService;
+  let service: GetYamlService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(YamlReaderService);
+    service = TestBed.inject(GetYamlService);
   });
 
   it('should be created', () => {
