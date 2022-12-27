@@ -1,11 +1,5 @@
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ɵɵsetComponentScope,
-} from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Mqtt } from '../mqtt.service';
 import { IMqttMessage } from 'ngx-mqtt';
 import { Subscription, takeUntil, Subject } from 'rxjs';
@@ -19,9 +13,9 @@ import { building_info } from 'src/app/environments/environment';
   styleUrls: ['./set-lamps.component.css'],
 })
 export class SetLampsComponent implements OnInit, OnDestroy {
-  ieee_address: string;
-  device_type: string;
-  floor_gateway: string;
+  IeeeAddress: string;
+  DeviceType: string;
+  FloorGateway: string;
   floor: string = '';
   gateway: string = '';
   room_type: Array<string> = [];
@@ -35,42 +29,39 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   in_group: boolean = true;
   device_topic: string = '';
   group_name: string = '';
-  group_tag: string = '';
+  GroupTag: string = '';
   click_source: string = '';
-  gateway_cap: string = '';
-  gateway_info: string = '';
+  Capacity: string = '';
+  GatewayInfo: string = '';
   friendly_name: string = '';
-  // form_group = new FormGroup({
-  //   form_deviceid: new FormControl('test'),
-  // });
-  // name = new FormControl('test');
+
   constructor(
     private route: Router,
     private mqtt_sub: Mqtt,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private ActRoute: ActivatedRoute
   ) {
-    let routed_data = this.route.getCurrentNavigation()!.extras.state as {
-      [key: string]: any;
-    };
     // let routed_data = ['0x84fd27fffe78b755', 'lamp', '10_1', 43, []];
-    this.ieee_address = routed_data[0];
-    this.device_type = routed_data[1];
-    this.floor_gateway = routed_data[2];
-    this.gateway_cap = routed_data[3];
-    this.gateway_info = routed_data[4];
-
-    if (this.device_type == 'lamp') {
-      this.group_tag = 'light_01';
-    } else if (this.device_type == 'blind') {
-      // TODO: ask luuk this
-      this.group_tag = 'blinds';
-    }
     this.room_type = ['office', 'meeting', 'common'];
   }
 
   ngOnInit(): void {
-    this.floor = this.floor_gateway.split('/')[0];
-    this.gateway = this.floor_gateway.split('/')[1];
+    this.ActRoute.queryParams.subscribe((params) => {
+      this.IeeeAddress = params['Address'];
+      this.DeviceType = params['DeviceType'];
+      this.FloorGateway = params['FloorGateway'];
+      this.Capacity = params['Capacity'];
+      this.GatewayInfo = params['OnlineGateways'];
+    });
+
+    this.floor = this.FloorGateway.split('/')[0];
+    this.gateway = this.FloorGateway.split('/')[1];
+
+    if (this.DeviceType == 'lamp') {
+      this.GroupTag = 'light_01';
+    } else if (this.DeviceType == 'blind') {
+      this.GroupTag = 'blinds';
+    }
     let range_numbers = [...Array(99).keys()];
     range_numbers.forEach((myNumber) => {
       let formattedNumber = myNumber.toLocaleString('en-US', {
@@ -84,7 +75,9 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   //{"data":{"from":"0x84fd27fffe78b755","homeassistant_rename":false,"to":"10/office/02/lamp03"},"status":"ok"}
 
   rename(event: any) {
-    this.click_source = event.target.name;
+    console.log(event);
+    this.click_source = event.explicitOriginalTarget.innerHTML;
+    console.log(this.click_source, 'FOUND CLICK SOURCE');
     this.friendly_name =
       // this.floor +
       // '/' +
@@ -92,11 +85,11 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       '/' +
       this.selectedOffice +
       '/' +
-      this.device_type +
+      this.DeviceType +
       this.selectedDevice;
 
     this.device_topic =
-      '"' + this.ieee_address + '"' + ', "to": "' + this.friendly_name;
+      '"' + this.IeeeAddress + '"' + ', "to": "' + this.friendly_name;
 
     this.group_name =
       // this.floor +
@@ -105,13 +98,13 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       '/' +
       this.selectedOffice +
       '/group/' +
-      this.group_tag;
+      this.GroupTag;
     this.group_check();
     this.rename_msg = '{"from":' + this.device_topic + '"}';
     this.check_rename_response();
     this.mqtt_sub.publish(
       building_info.building_sateraito_prefix +
-        this.floor_gateway +
+        this.FloorGateway +
         '/bridge/request/device/rename',
       this.rename_msg
     );
@@ -121,13 +114,13 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   check_rename_response() {
     console.log(
       building_info.building_sateraito_prefix +
-        this.floor_gateway +
+        this.FloorGateway +
         '/bridge/response/device/rename'
     );
     this.subscription = this.mqtt_sub
       .topic(
         building_info.building_sateraito_prefix +
-          this.floor_gateway +
+          this.FloorGateway +
           '/bridge/response/device/rename'
       )
       .pipe(takeUntil(this.unSubscribe$))
@@ -174,7 +167,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     this.subscription = this.mqtt_sub
       .topic(
         building_info.building_sateraito_prefix +
-          this.floor_gateway +
+          this.FloorGateway +
           '/bridge/groups'
       )
       .pipe(takeUntil(this.unSubscribe$))
@@ -182,7 +175,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
         let msg: string = message.payload.toString();
         console.log('the groups ', msg);
         console.log('the group were looking for', this.group_name);
-        if (this.ieee_address !== '' && msg.includes(this.group_name)) {
+        if (this.IeeeAddress !== '' && msg.includes(this.group_name)) {
           this.in_group = true;
           console.log('group exists');
         } else {
@@ -195,7 +188,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   group_add() {
     let group_add_topic =
       building_info.building_sateraito_prefix +
-      this.floor_gateway +
+      this.FloorGateway +
       '/bridge/request/group/add';
     console.log('adding group', this.group_name);
     this.mqtt_sub.publish(group_add_topic, this.group_name);
@@ -213,7 +206,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       '}';
     let device_add_topic =
       building_info.building_sateraito_prefix +
-      this.floor_gateway +
+      this.FloorGateway +
       '/bridge/request/group/members/add';
     console.log('adding device ', this.friendly_name, ' to ', this.group_name);
     this.mqtt_sub.publish(device_add_topic, add_msg);
@@ -232,7 +225,8 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     for (let step = 0; step < 5; step++) {
       this.mqtt_sub.publish(
         building_info.building_sateraito_prefix +
-          this.floor_gateway +
+          this.FloorGateway +
+          '/' +
           friendly_name_no_building +
           '/set',
         '{"state": "OFF"}'
@@ -240,7 +234,8 @@ export class SetLampsComponent implements OnInit, OnDestroy {
       await this.sleep(1000);
       this.mqtt_sub.publish(
         building_info.building_sateraito_prefix +
-          this.floor_gateway +
+          this.FloorGateway +
+          '/' +
           friendly_name_no_building +
           '/set',
         '{"state": "ON"}'
@@ -250,20 +245,33 @@ export class SetLampsComponent implements OnInit, OnDestroy {
   route_next() {
     console.log(' the click source is    ', this.click_source);
     this.turn_on_and_off();
-    if (this.click_source == 'nextdevice') {
+    if (this.click_source.includes('Next Device')) {
       this.route.navigate(['loading-page'], {
-        state: [this.gateway_cap, this.gateway, this.floor, this.gateway_info],
+        queryParams: {
+          floor: this.floor,
+          OnlineGateways: this.GatewayInfo,
+          Capacity: this.Capacity,
+          CurrGateway: this.FloorGateway.split('/')[1],
+        },
       });
-    } else if (this.click_source == 'finisheddevice') {
+    } else if (this.click_source.includes('Finished')) {
       let gateway_topic =
         building_info.building_sateraito_prefix +
-        this.floor_gateway +
+        this.FloorGateway +
         '/bridge/request/permit_join';
       this.mqtt_sub.publish(gateway_topic, '{"value": false}');
       console.log('closing gateway at ', gateway_topic);
       this.route.navigate(['gateway-selector'], {
-        state: [this.floor, this.gateway_info],
+        queryParams: {
+          FloorNumber: this.floor,
+          OnlineGateways: this.GatewayInfo,
+        },
       });
+      // this.IeeeAddress = params['Address'];
+      // this.DeviceType = params['DeviceType'];
+      // this.FloorGateway = params['FloorGateway'];
+      // this.Capacity = params['Capacity'];
+      // this.GatewayInfo = params['OnlineGateways'];
     } else {
       console.log('No relevant click source found');
     }
@@ -278,7 +286,7 @@ export class SetLampsComponent implements OnInit, OnDestroy {
     if (!this.numbers.slice(0, 7).includes(selected_room_device)) {
       let dialogref = this.dialog.open(PopuperrorComponent, {
         width: '600px',
-        data: [this.device_type],
+        data: [this.DeviceType],
         enterAnimationDuration,
         exitAnimationDuration,
       });

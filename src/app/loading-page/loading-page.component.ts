@@ -3,7 +3,7 @@ import { Subscription, takeUntil, Subject, of } from 'rxjs';
 import { timeout, catchError } from 'rxjs/operators';
 import { Mqtt } from '../mqtt.service';
 import { IMqttMessage } from 'ngx-mqtt';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { building_info } from '../environments/environment';
 @Component({
   selector: 'app-loading-page',
@@ -13,21 +13,34 @@ import { building_info } from '../environments/environment';
 export class LoadingPageComponent implements OnInit, OnDestroy {
   subscription!: Subscription;
   unSubscribe$ = new Subject();
-  routed_data: any;
   ieee_addres: string = '';
+  Capacity: string;
+  OnlineGateways: Array<string>;
   device_id: string = '';
   nav_page: string = '';
   floor_gateway: string = '';
+  floor: string;
+  CurrGateway: string;
   count: number = 0;
   status: string = '';
-  constructor(private mqtt_sub: Mqtt, private route: Router) {
-    this.routed_data = this.route.getCurrentNavigation()!.extras.state;
-  }
+  constructor(
+    private mqtt_sub: Mqtt,
+    private route: Router,
+    private ActRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    console.log('all data', this.routed_data);
-    let clicked_gateway = this.routed_data[1].replace('Gateway ', '').trim(); //TODO: OMG THIS NEEDS TO GO
-    this.floor_gateway = this.routed_data[2] + '/' + clicked_gateway;
+    this.ActRoute.queryParams.subscribe((params) => {
+      this.Capacity = params['Capacity'];
+      this.OnlineGateways = params['OnlineGateways'];
+      this.CurrGateway = params['CurrGateway'];
+      this.floor = params['floor'];
+      this.floor_gateway = `${this.floor}/${this.CurrGateway}`;
+    });
+
+    // console.log('all data', this.routed_data);
+    // let clicked_gateway = this.routed_data[1].replace('Gateway ', '').trim(); //TODO: OMG THIS NEEDS TO GO
+    // this.floor_gateway = this.routed_data[2] + '/' + clicked_gateway;
     let topic: string =
       building_info.building_sateraito_prefix +
       this.floor_gateway +
@@ -91,24 +104,24 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
     if (id.includes('LED') || id.includes('lamp')) {
       this.nav_page = 'set-lamps';
       this.route.navigate([this.nav_page], {
-        state: [
-          ieee_addres,
-          'lamp',
-          this.floor_gateway,
-          this.routed_data[0], //gateway cap
-          this.routed_data[3], //gateway info
-        ],
+        queryParams: {
+          Address: ieee_addres,
+          DeviceType: 'lamp',
+          FloorGateway: this.floor_gateway,
+          Capacity: this.Capacity, //gateway cap
+          OnlineGateways: this.OnlineGateways, //gateway info
+        },
       });
     } else if (id.includes('blind')) {
       this.nav_page = 'set-lamps';
       this.route.navigate([this.nav_page], {
-        state: [
-          ieee_addres,
-          'blind',
-          this.floor_gateway,
-          this.routed_data[0], //gateway cap
-          this.routed_data[3], //gateway info
-        ],
+        queryParams: {
+          Address: ieee_addres,
+          DeviceType: 'blind',
+          FloorGateway: this.floor_gateway,
+          Capacity: this.Capacity, //gateway cap
+          OnlineGateways: this.OnlineGateways, //gateway info
+        },
       });
     } else {
       console.log('UNIDENTIFIED PRODUCT FOUND');
@@ -116,20 +129,20 @@ export class LoadingPageComponent implements OnInit, OnDestroy {
   }
 
   navigate_back() {
-    let gateway_selected = this.routed_data[1];
-    let floor = this.routed_data[2];
-    let gateway_state = this.routed_data[3];
+    // let gateway_selected = this.routed_data[1];
+    // let floor = this.routed_data[2];
+    // let gateway_state = this.routed_data[3];
     this.mqtt_sub.publish(
       building_info.building_sateraito_prefix +
-        floor +
+        this.floor +
         '/' +
-        gateway_selected +
+        this.CurrGateway +
         '/bridge/request/permit_join',
       '{"value": false}'
     );
     // closing off the gateway before we return
     this.route.navigate(['gateway-selector'], {
-      state: [floor, gateway_state],
+      state: [this.floor, this.OnlineGateways],
     });
   }
   ngOnDestroy(): void {

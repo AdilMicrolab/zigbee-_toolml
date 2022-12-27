@@ -27,7 +27,8 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('03/12/2022 version');
+    //TODO: add route parameters look at SPA
+    console.log('27/12/2022 version');
     let sateraito_topic: string =
       building_info.building_sateraito_prefix + '+/+/bridge/state';
     console.log(sateraito_topic);
@@ -75,20 +76,23 @@ export class FloorSelectorComponent implements OnInit, OnDestroy {
     this.devices_selec = [
       ...new Set(devices.map((a: any) => [a.gateway, a.status])),
     ].sort();
-
+    console.log('YEEE', this.devices_selec);
     return this.devices_selec;
     // get all devices for each floor and append
   }
 
   Floor_selected(
     gateway_info: { floor: string; gateway: string; status: string }[],
-    floor: any
+    floor: string
   ) {
     this.match_floors_gateways(gateway_info, floor);
-
-    this.route.navigate(['gateway-selector'], {
-      state: [floor, this.devices_selec],
+    this.route.navigate(['/device-page'], {
+      queryParams: { FloorNumber: floor, OnlineGateways: this.devices_selec },
     });
+    console.log(this.devices_selec);
+    // this.route.navigate(['gateway-selector'], {
+    //   state: [floor, this.devices_selec],
+    // });
     //console.log(this.floor_selec);
   }
 

@@ -1,5 +1,122 @@
-<div class="top_center">
-  <img *ngIf="this.device_type == 'lamp'; else blind" src="/assets/image.png" />
+<div class="w-full h-full flex justify-between items-center flex-col">
+  <div class="w-1/4 h-auto">
+    <img
+      *ngIf="this.DeviceType == 'lamp'; else blind"
+      src="/assets/image.png"
+    />
+    <div class="w-1/2 h-auto">
+      <ng-template class="centered_blinds" #blind>
+        <img src="/assets/blindnames.png" />
+      </ng-template>
+      <div>
+        <h4 class="w-full h-full">
+          Structure of numbering {{ this.DeviceType }}s, left to right starting
+          from the door
+        </h4>
+        <div>
+          <form ngForm name="setform" #setform="ngForm">
+            <div>
+              <mat-form-field appearance="outline">
+                <mat-label>Room Type</mat-label>
+                <mat-select
+                  required
+                  [(ngModel)]="this.selectedRoomtype"
+                  name="type"
+                  #type="ngModel"
+                >
+                  <mat-option
+                    *ngFor="let room of this.room_type"
+                    [value]="room"
+                    >{{ room }}</mat-option
+                  >
+                </mat-select>
+                <mat-error *ngIf="type.touched && type.invalid"
+                  >This field is required.</mat-error
+                >
+              </mat-form-field>
+            </div>
+            <div class="vert_cent">
+              <mat-form-field appearance="outline">
+                <mat-label>Room Number</mat-label>
+                <mat-select
+                  required
+                  [(ngModel)]="this.selectedOffice"
+                  name="office"
+                  #office="ngModel"
+                >
+                  <mat-option
+                    *ngFor="let number of this.numbers | slice : 1 : 100"
+                    [value]="number"
+                  >
+                    {{ number }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="office.touched && office.invalid"
+                  >This field is required.</mat-error
+                >
+              </mat-form-field>
+            </div>
+            <div class="vert_cent">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ this.DeviceType | titlecase }}</mat-label>
+                <mat-select
+                  required
+                  [(ngModel)]="this.selectedDevice"
+                  name="device"
+                  #device="ngModel"
+                >
+                  <!-- [placeholder]="this.selectedDevice" -->
+
+                  <mat-option
+                    *ngFor="let number of this.numbers | slice : 1 : 20"
+                    [value]="number"
+                    (click)="room_limit_warning($event, '0ms', '100ms')"
+                  >
+                    <!-- [formControl]="form_deviceid" -->
+                    {{ number }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="device.touched && device.invalid"
+                  >This field is required.</mat-error
+                >
+              </mat-form-field>
+            </div>
+            <div class="next_device">
+              <button
+                mat-raised-button
+                name="nextdevice"
+                class="finished"
+                [disabled]="!setform.form.valid"
+                (click)="rename($event)"
+              >
+                Next Device
+              </button>
+            </div>
+            <div>
+              <button
+                mat-raised-button
+                name="finisheddevice"
+                class="finished"
+                [disabled]="!setform.form.valid"
+                (click)="rename($event)"
+              >
+                Next and Finished
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="">
+      <img
+        class="justify-center w-40 h-auto flex-row pb-20"
+        src="/assets/MICROLAB_LOGO_BLUE.png"
+      />
+    </div>
+  </div>
+
+  <!-- <div class="top_center">
+  <img *ngIf="this.DeviceType == 'lamp'; else blind" src="/assets/image.png" />
 </div>
 <div class="centered_blinds">
   <ng-template class="centered_blinds" #blind>
@@ -8,7 +125,7 @@
 </div>
 <div class="bottom_text">
   <h4>
-    Structure of numbering {{ this.device_type }}s, left to right starting from
+    Structure of numbering {{ this.DeviceType }}s, left to right starting from
     the door
   </h4>
 </div>
@@ -41,7 +158,7 @@
         #office="ngModel"
       >
         <mat-option
-          *ngFor="let number of this.numbers | slice: 1:100"
+          *ngFor="let number of this.numbers | slice : 1 : 100"
           [value]="number"
         >
           {{ number }}
@@ -54,21 +171,19 @@
   </div>
   <div class="vert_cent">
     <mat-form-field appearance="outline">
-      <mat-label>{{ this.device_type | titlecase }}</mat-label>
+      <mat-label>{{ this.DeviceType | titlecase }}</mat-label>
       <mat-select
         required
         [(ngModel)]="this.selectedDevice"
         name="device"
         #device="ngModel"
       >
-        <!-- [placeholder]="this.selectedDevice" -->
 
         <mat-option
-          *ngFor="let number of this.numbers | slice: 1:20"
+          *ngFor="let number of this.numbers | slice : 1 : 20"
           [value]="number"
           (click)="room_limit_warning($event, '0ms', '100ms')"
         >
-          <!-- [formControl]="form_deviceid" -->
           {{ number }}
         </mat-option>
       </mat-select>
@@ -99,4 +214,5 @@
       Next and Finished
     </button>
   </div>
-</form>
+</form> -->
+</div>

@@ -1,10 +1,29 @@
-<div class="centered">
+<div class="w-full h-full flex justify-between items-center flex-col">
+  <div>
+    <p class="tracking-widest font-serif text-xl pt-5">
+      Floor {{ this.floor }}
+    </p>
+  </div>
+
   <div>
     <h2>Capacity: {{ this.count }}/50</h2>
   </div>
   <mat-spinner color="blue"></mat-spinner>
   <p>Finding new devices...</p>
   <div class="back">
-    <button class="backbutton" (click)="navigate_back()">back</button>
+    <button
+      class="backbutton"
+      (click)="navigate_back()"
+      mat-raised-button
+      color="warn"
+    >
+      back
+    </button>
+  </div>
+  <div class="">
+    <img
+      class="justify-center w-40 h-auto flex-row pb-20"
+      src="/assets/MICROLAB_LOGO_BLUE.png"
+    />
   </div>
 </div>

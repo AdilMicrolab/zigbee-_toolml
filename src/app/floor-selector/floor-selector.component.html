@@ -1,10 +1,36 @@
-<!-- <div class="row">
-    <div class="col">
-    <div *ngFor="let floor of floor_devices | keyvalue">{{floor.key}}</div>
+<!-- TODO: add mat card -->
+<div class="w-full h-full flex justify-between items-center flex-col">
+  <div></div>
+  <div ngbDropdown class="d-inline-block">
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      id="dropdownBasic1"
+      ngbDropdownToggle
+    >
+      Select floor
+    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+      <button
+        ngbDropdownItem
+        *ngFor="let floor of floor_list"
+        (click)="Floor_selected(gateway_info, floor)"
+      >
+        {{ floor }}
+      </button>
+    </div>
+  </div>
+  <div>
+    <img
+      class="justify-center w-40 h-auto flex-row pb-20"
+      src="/assets/MICROLAB_LOGO_BLUE.png"
+    />
+  </div>
 </div>
-</div> -->
+
+<!-- 
 <div class="top_center">
-  <img src="/assets/image.png" />
+  <img class="object-fit w-400" src="/assets/image.png" />
 </div>
 <div class="bottom_text">
   <h4>Structure of numbering lamps, left to right starting from the door</h4>
@@ -33,29 +59,4 @@
       </div>
     </div>
   </div>
-</div>
-
-<!-- <div class="top_center">
-  <img src="/assets/image.png" />
-</div>
-<div class="bottom_text">
-  <h4>Structure of numbering lamps, left to right starting from the door</h4>
-</div>
-<form ngForm class="centered" name="setform" #setform="ngForm">
-  <div class="vert_cent">
-    <mat-form-field appearance="outline">
-      <mat-label>Room</mat-label>
-      <mat-select
-        required
-        [(ngModel)]="this.test"
-        name="type"
-        #type="ngModel"
-        (selectionChange)="Floor_selected($event, gateway_info)"
-      >
-        <mat-option *ngFor="let floor of this.floor_list" [value]="floor">{{
-          floor
-        }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
-</form> -->
+</div> -->

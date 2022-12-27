@@ -22,7 +22,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PopuperrorComponent } from './set-lamps/popuperror/popuperror.component';
 import { MQTT_SERVICE_OPTIONS } from './environments/environment';
-
+import { LightShowComponent } from './light-show/light-show.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCard, MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
+import { MatSortModule } from '@angular/material/sort';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,8 +40,10 @@ import { MQTT_SERVICE_OPTIONS } from './environments/environment';
     SetLampsComponent,
     DialogPopupComponent,
     PopuperrorComponent,
+    LightShowComponent,
   ],
   imports: [
+    MatPaginatorModule,
     BrowserModule,
     OverlayModule,
     MatInputModule,
@@ -46,15 +54,22 @@ import { MQTT_SERVICE_OPTIONS } from './environments/environment';
     BrowserAnimationsModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatCardModule,
+    CommonModule,
+    MatSortModule,
     RouterModule.forRoot([
       // {path: 'home-page', component: HomePageComponent},
       { path: '', component: FloorSelectorComponent },
+      { path: 'device-page', component: DevicePageComponent },
       { path: 'floor-selector', component: FloorSelectorComponent },
       { path: 'gateway-selector', component: GatewaySelectorComponent },
       { path: 'device-page', component: DevicePageComponent },
       { path: 'confirm-page', component: ConfirmPageComponent },
       { path: 'loading-page', component: LoadingPageComponent },
       { path: 'set-lamps', component: SetLampsComponent },
+      { path: 'light-show', component: LightShowComponent },
     ]),
     NgbModule,
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS),

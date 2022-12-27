@@ -1,35 +1,52 @@
-<div class="top_center">
-  <img src="/assets/image.png" />
-</div>
-<div class="bottom_text">
-  <h4>Structure of numbering lamps, left to right starting from the door</h4>
-</div>
-<div class="centered">
-  <div class="row">
-    <div class="col">
-      <div ngbDropdown class="d-inline-block">
-        <button
-          type="button"
-          class="btn btn-outline-primary"
-          id="dropdownBasic1"
-          ngbDropdownToggle
-        >
-          Select gateway
-        </button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-          <button
-            ngbDropdownItem
-            [disabled]="disable_gateways(gateway[1], gateway[2])"
-            *ngFor="let gateway of full_gateway_description"
-            (click)="openDialog('0ms', '0ms', gateway)"
-          >
-            Gateway {{ gateway[0] }} (cap. {{ gateway[2] }})
-          </button>
-        </div>
-      </div>
+<div class="w-full h-full flex justify-between items-center flex-col">
+  <!-- <img class="w-1/2 h-auto" src="/assets/image.png" /> -->
+  <div>
+    <p class="tracking-widest font-serif text-xl pt-5">
+      Floor {{ this.current_floor }}
+    </p>
+  </div>
+  <div ngbDropdown class="flex justify-center items-center mt-40">
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      id="dropdownBasic1"
+      ngbDropdownToggle
+    >
+      Select gateway
+    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+      <button
+        ngbDropdownItem
+        [disabled]="disable_gateways(gateway[1], gateway[2])"
+        *ngFor="let gateway of full_gateway_description"
+        (click)="openDialog('0ms', '0ms', gateway)"
+      >
+        Gateway {{ gateway[0] }} (cap. {{ gateway[2] }})
+      </button>
     </div>
   </div>
-  <div class="back">
-    <button class="backbutton" (click)="navigate_back()">back</button>
+  <!-- <button
+    class="mt-2"
+    mat-raised-button
+    color="primary"
+    (click)="navigate_test_env()"
+  >
+    Test Environment
+  </button> -->
+  <div class="w-full flex justify-evenly items-center mt-[50px]">
+    <button
+      class="mt-2"
+      (click)="navigate_back()"
+      mat-raised-button
+      color="warn"
+    >
+      back
+    </button>
+  </div>
+  <div class="">
+    <img
+      class="justify-center w-40 h-auto flex-row pb-20"
+      src="/assets/MICROLAB_LOGO_BLUE.png"
+    />
   </div>
 </div>

@@ -1,1 +1,38 @@
-<p>device-page works!</p>
+<div class="w-full h-full flex justify-between items-center flex-col">
+  <div>
+    <p class="tracking-widest font-serif text-xl pt-5">
+      Floor {{ this.FloorNumber }}
+    </p>
+  </div>
+  <button
+    mat-raised-button
+    color="primary"
+    class="w-36"
+    (click)="RouteGateway()"
+  >
+    Zigbee
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    class="w-36"
+    disabled="true"
+    matTooltip="Currently not available.."
+  >
+    Wifi
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    class="w-36"
+    (click)="RouteTestEnv()"
+  >
+    Test Environment
+  </button>
+  <div class="">
+    <img
+      class="justify-center w-40 h-auto flex-row pb-20"
+      src="/assets/MICROLAB_LOGO_BLUE.png"
+    />
+  </div>
+</div>

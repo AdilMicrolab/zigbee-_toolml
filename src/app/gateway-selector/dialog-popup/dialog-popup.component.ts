@@ -15,6 +15,7 @@ import { building_info } from 'src/app/environments/environment';
 })
 export class DialogPopupComponent implements OnInit {
   gateway_array: [] = [];
+  floor: string;
   selec_gateway: string = '';
 
   constructor(
@@ -25,37 +26,34 @@ export class DialogPopupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('test', this.data);
     this.selec_gateway = this.data[1];
+    this.floor = this.data[2];
     this.gateway_array = this.data[3];
+    console.log(this.selec_gateway);
+    console.log('this isthe gatewayarary ', this.gateway_array);
   }
 
   route_set_page() {
     this.gateway_array.forEach((array) => {
-      console.log(array);
       if (array[0] == this.selec_gateway) {
-        this.mqtt.publish(
-          building_info.building_sateraito_prefix +
-            this.data[2] +
-            '/' +
-            this.selec_gateway +
-            '/bridge/request/permit_join',
-          '{"value": true, "time": 1800}'
-          // TODO: remove time to normal and check if next_device should restart timer
-        );
+        let OpenBridgeTopic = `${building_info.building_sateraito_prefix}${this.floor}/${array[0]}/bridge/request/permit_join`;
+        this.mqtt.publish(OpenBridgeTopic, '{"value": true, "time": 1800}');
+
+        // TODO: remove time to normal and check if next_device should restart timer
       } else {
-        this.mqtt.publish(
-          building_info.building_sateraito_prefix +
-            this.data[2] +
-            '/' +
-            array[0] +
-            '/bridge/request/permit_join',
-          '{"value": false}'
-        );
+        console.log('Publishing false to ', array[0]);
+        let OpenBridgeTopic = `${building_info.building_sateraito_prefix}${this.floor}/${array[0]}/bridge/request/permit_join`;
+        this.mqtt.publish(OpenBridgeTopic, '{"value": false}');
       }
     });
+    console.log('this is the data being sent ', this.data);
     this.route.navigate(['loading-page'], {
-      state: this.data,
+      queryParams: {
+        Capacity: this.data[0],
+        CurrGateway: this.data[1],
+        floor: this.data[2],
+        OnlineGateways: this.data[3],
+      },
     });
   }
 }

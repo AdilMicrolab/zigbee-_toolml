@@ -1,0 +1,258 @@
+<div
+  *ngIf="this.ShowIndividual == true"
+  class="w-full h-full flex justify-start items-center flex-col"
+>
+  <div class="w-full h-auto pl-11 pt-11 flex flex-row justify-start">
+    <button
+      class="w-28 flex pl-10"
+      mat-raised-button
+      color="primary"
+      (click)="ToggleGroup()"
+    >
+      Group
+    </button>
+    <!-- <button class="w-28 flex pl-10" mat-raised-button color="primary" (click)="Individual()">
+      Individual
+    </button> -->
+  </div>
+  <div class="w-full h-full px-5 py-5">
+    <mat-paginator
+      IndivPaginator="matPaginator"
+      [pageSizeOptions]="[150, 50, 25]"
+      showFirstLastButtons
+      class="mat-elevation-z8 w-full"
+    >
+    </mat-paginator>
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      class="mat-elevation-z8 w-full"
+      matSort
+      #empTbSort="matSort"
+    >
+      <ng-container matColumnDef="friendlyName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Friendly Name</th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="whitespace-nowrap text-ellipsis overflow-ellipsis max-w-[50px]"
+        >
+          {{ element.friendlyName || "not defined" }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Gateway">
+        <th mat-header-cell *matHeaderCellDef>Gateway</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          {{ element.Gateway }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="deviceType">
+        <th mat-header-cell *matHeaderCellDef>Device Type</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 50px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          {{ element.deviceType }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="IeeeAddress">
+        <th mat-header-cell *matHeaderCellDef>ieee_address</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 50px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          {{ element.IeeeAddress }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="vendor">
+        <th mat-header-cell *matHeaderCellDef>vendor</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          {{ element.vendor }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Options">
+        <th mat-header-cell *matHeaderCellDef>Options</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          <button
+            mat-raised-button
+            color="primary"
+            class="mt-2"
+            (click)="ToggleDevice(element.friendlyName, element.Gateway)"
+          >
+            Toggle
+          </button>
+        </td>
+      </ng-container>
+
+      <tr
+        mat-header-row
+        *matHeaderRowDef="DisplayColumnsIndiv; sticky: true"
+      ></tr>
+      <tr mat-row *matRowDef="let row; columns: DisplayColumnsIndiv"></tr>
+    </table>
+  </div>
+</div>
+
+<div
+  *ngIf="!this.ShowIndividual == true"
+  class="w-full h-full flex justify-start items-center flex-col"
+>
+  <div class="w-full h-auto pl-11 pt-11 flex flex-row justify-start">
+    <button
+      class="w-28 flex pl-10"
+      mat-raised-button
+      color="primary"
+      (click)="ToggleGroup()"
+    >
+      Individual
+    </button>
+  </div>
+  <div class="w-full h-full px-5 py-5">
+    <mat-paginator
+      GroupPaginator="matPaginator"
+      [pageSizeOptions]="[50, 25]"
+      showFirstLastButtons
+      class="mat-elevation-z8 w-full"
+    >
+    </mat-paginator>
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      class="mat-elevation-z8 w-full"
+      #table
+      matSort
+    >
+      <ng-container matColumnDef="friendlyName">
+        <th mat-header-cell *matHeaderCellDef>Friendly Name</th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="whitespace-nowrap text-ellipsis overflow-ellipsis max-w-[50px]"
+        >
+          {{ element.friendlyName || "test" }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Gateway">
+        <th mat-header-cell *matHeaderCellDef>Gateway</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          {{ element.Gateway }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Members">
+        <th mat-header-cell *matHeaderCellDef>Members</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 50px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          {{ element.Members }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="vendor">
+        <th mat-header-cell *matHeaderCellDef>vendor</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          {{ element.vendor }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Options">
+        <th mat-header-cell *matHeaderCellDef>Options</th>
+        <td
+          style="
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100px;
+          "
+          mat-cell
+          *matCellDef="let element"
+        >
+          <button
+            mat-raised-button
+            color="primary"
+            class="mt-2"
+            (click)="ToggleDevice(element.friendlyName, element.Gateway)"
+          >
+            Toggle
+          </button>
+        </td>
+      </ng-container>
+
+      <tr
+        mat-header-row
+        *matHeaderRowDef="DisplayColumnsGroups; sticky: true"
+      ></tr>
+      <tr mat-row *matRowDef="let row; columns: DisplayColumnsGroups"></tr>
+    </table>
+  </div>
+</div>
